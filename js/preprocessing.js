@@ -1,10 +1,10 @@
 d3.csv("data/games.csv").then(data => {
     function formatData() {
-        const games = new Map();
+        const games = [];
         data.forEach(d => {
             // Just add Sales data if game already exists on other platforms
-            const i = games.get(d.Name);
-            if (i) {
+            const i = games.find(e => e.name == d.Name);
+            if (i != undefined) {
                 i.sales.push({
                     sales_platform: d.Platform,
                     na_sales: +d.NA_Sales,
@@ -37,12 +37,9 @@ d3.csv("data/games.csv").then(data => {
                 other_sales: +d.Other_Sales,
                 global_sales: +d.Global_Sales
             }];
-            games.set(game.name, game);
+            games.push(game);
         });
-        console.log(games);
         return games;
     }
-    console.time('formatData');
-    formatData();
-    console.timeEnd('formatData');
+    console.log(formatData());
 });

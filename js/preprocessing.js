@@ -4,9 +4,10 @@ d3.csv("data/games.csv").then(data => {
         data.forEach(d => {
             // Just add Sales data if game already exists on other platforms
             const i = games.find(e => e.name == d.Name);
-            if (i != undefined) {
+            if (i) {
                 i.sales.push({
                     sales_platform: d.Platform,
+                    year = +d.Year_of_Release,
                     na_sales: +d.NA_Sales,
                     eu_sales: +d.EU_Sales,
                     jp_sales: +d.JP_Sales,
@@ -26,7 +27,6 @@ d3.csv("data/games.csv").then(data => {
             else if (d.Platform.match(/^(3DS|DS|GB|GBA|GC|N64|NES|SNES|Wii|WiiU)$/)) game.platform_company = "Nintendo";
             else game.platform_company = 'Others';
 
-            game.year = +d.Year_of_Release;
             game.genre = d.Genre;
             game.publisher = d.Publisher;
             game.sales = [{

@@ -7,7 +7,7 @@ d3.csv("data/games.csv").then(data => {
             if (i) {
                 i.sales.push({
                     sales_platform: d.Platform,
-                    year = +d.Year_of_Release,
+                    year: +d.Year_of_Release,
                     na_sales: +d.NA_Sales,
                     eu_sales: +d.EU_Sales,
                     jp_sales: +d.JP_Sales,

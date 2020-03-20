@@ -31,6 +31,7 @@ d3.csv("data/games.csv").then(data => {
             game.publisher = d.Publisher;
             game.sales = [{
                 sales_platform: game.platform,
+                year: +d.Year_of_Release,
                 na_sales: +d.NA_Sales,
                 eu_sales: +d.EU_Sales,
                 jp_sales: +d.JP_Sales,

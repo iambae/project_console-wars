@@ -1,7 +1,16 @@
+let mainView = new MainView({ parentElement: '#main' });
+
 d3.csv("data/games.csv").then(data => {
+
+    let salesMax = 0,
+        salesMin = Infinity;
     function formatData() {
         const games = [];
         data.forEach(d => {
+            // update max min
+            if (salesMax < +d.global_sales) salesMax = +d.global_sales;
+            if (salesMin > +d.global_sales) salesMin = +d.global_sales;
+
             // Just add Sales data if game already exists on other platforms
             const i = games.find(e => e.name == d.Name);
             if (i) {
@@ -19,7 +28,7 @@ d3.csv("data/games.csv").then(data => {
             const game = {};
             game.name = d.Name;
             game.platform = d.Platform;
-            
+
             // Add platform_company column
             if (d.Platform.match(/^(PS|PS2|PS3|PS4|PSP|PSV)$/)) game.platform_company = "Sony";
             else if (d.Platform.match(/^(XB|X360|XOne)$/)) game.platform_company = "Mircosoft";
@@ -42,5 +51,9 @@ d3.csv("data/games.csv").then(data => {
         });
         return games;
     }
-    console.log(formatData());
+    mainView.data = formatData();
+    mainView.salesMax = salesMax;
+    console.log(salesMax)
+    mainView.salesMin = salesMin;
+    console.log(salesMin)
 });

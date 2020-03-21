@@ -4,27 +4,13 @@ d3.csv("data/games.csv").then(data => {
 
     let salesMax = 0,
         salesMin = Infinity;
-    function formatData() {
+    function formatDataForMain() {
         const games = [];
         data.forEach(d => {
             // update max min
             if (salesMax < +d.global_sales) salesMax = +d.global_sales;
             if (salesMin > +d.global_sales) salesMin = +d.global_sales;
 
-            // Just add Sales data if game already exists on other platforms
-            const i = games.find(e => e.name == d.Name);
-            if (i) {
-                i.sales.push({
-                    sales_platform: d.Platform,
-                    year: +d.Year_of_Release,
-                    na_sales: +d.NA_Sales,
-                    eu_sales: +d.EU_Sales,
-                    jp_sales: +d.JP_Sales,
-                    other_sales: +d.Other_Sales,
-                    global_sales: +d.Global_Sales
-                });
-                return;
-            }
             const game = {};
             game.name = d.Name;
             game.platform = d.Platform;
@@ -38,20 +24,18 @@ d3.csv("data/games.csv").then(data => {
 
             game.genre = d.Genre;
             game.publisher = d.Publisher;
-            game.sales = [{
-                sales_platform: game.platform,
-                year: +d.Year_of_Release,
-                na_sales: +d.NA_Sales,
-                eu_sales: +d.EU_Sales,
-                jp_sales: +d.JP_Sales,
-                other_sales: +d.Other_Sales,
-                global_sales: +d.Global_Sales
-            }];
+            game.game.year = +d.Year_of_Release;
+            game.na_sales = +d.NA_Sales;
+            game.eu_sales = +d.EU_Sales;
+            game.jp_sales = +d.JP_Sales;
+            game.other_sales = +d.Other_Sales;
+            game.global_sales = +d.Global_Sales;
             games.push(game);
         });
         return games;
     }
-    mainView.data = formatData();
+
+    mainView.data = formatDataForMain();
     mainView.salesMax = salesMax;
     console.log(salesMax)
     mainView.salesMin = salesMin;

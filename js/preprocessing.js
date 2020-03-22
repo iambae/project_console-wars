@@ -36,4 +36,5 @@ d3.csv("data/games.csv").then(data => {
     mainView.data = formatDataForMain();
     mainView.salesMax = salesMax;
     mainView.salesMin = salesMin;
+    mainView.initVis();
 });

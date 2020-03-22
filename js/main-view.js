@@ -18,15 +18,25 @@ class MainView {
             .attr('height', vis.config.containerHeight);
 
         vis.sony_group = vis.svg.append('g')
-            .attr('class', 'sony');
+            .attr('class', 'sony')
+            .attr("x", Math.cos(3 / 5 * 2 * Math.PI) * 200 + vis.config.containerWidth / 2)
+            .attr("y", Math.sin(3 / 5 * 2 * Math.PI) * 200 + vis.config.containerHeight / 2);
         vis.microsoft_group = vis.svg.append('g')
-            .attr('class', 'microsoft');
+            .attr('class', 'microsoft')
+            .attr("x", Math.cos(4 / 5 * 2 * Math.PI) * 200 + vis.config.containerWidth / 2)
+            .attr("y", Math.sin(4 / 5 * 2 * Math.PI) * 200 + vis.config.containerHeight / 2);
         vis.nintendo_group = vis.svg.append('g')
-            .attr('class', 'nintendo');
+            .attr('class', 'nintendo')
+            .attr("x", Math.cos(5 / 5 * 2 * Math.PI) * 200 + vis.config.containerWidth / 2)
+            .attr("y", Math.sin(5 / 5 * 2 * Math.PI) * 200 + vis.config.containerHeight / 2);
         vis.pc_group = vis.svg.append('g')
-            .attr('class', 'pc');
+            .attr('class', 'pc')
+            .attr("x", Math.cos(1 / 5 * 2 * Math.PI) * 200 + vis.config.containerWidth / 2)
+            .attr("y", Math.sin(1 / 5 * 2 * Math.PI) * 200 + vis.config.containerHeight / 2);
         vis.others_group = vis.svg.append('g')
-            .attr('class', 'others');
+            .attr('class', 'others')
+            .attr("x", Math.cos(2 / 5 * 2 * Math.PI) * 200 + vis.config.containerWidth / 2)
+            .attr("y", Math.sin(2 / 5 * 2 * Math.PI) * 200 + vis.config.containerHeight / 2);
 
         // Data
         vis.sony_games = vis.data[0];
@@ -41,13 +51,18 @@ class MainView {
 
     initForce() {
         let padding = 1; // padding within cluster
+        let circles = d3.selectAll('circles');
         this.force = d3.forceSimulation()
+            .force("cluster", this.cluster())
             .force('center', d3.forceCenter(this.config.containerWidth / 2, this.config.containerHeight / 2))
-            //.force('cluster', this.cluster()
-            //    .strength(0.2))
             .force('collide', d3.forceCollide(d => this.circleRadius(d.global_sales) + padding)
                 .strength(0.7))
-            .nodes(d3.selectAll('circles'));
+            .on('tick', function (e) {
+                circles
+                    .attr('cx', d => d.x)
+                    .attr('cx', d => d.y);
+            })
+            .nodes(circles);
     }
 
     update() {
@@ -70,8 +85,8 @@ class MainView {
             .transition()
             .attr('class', "sony-nodes")
             .attr("r", d => vis.circleRadius(d.global_sales))
-            .attr("cx", Math.cos(3 / 5 * 2 * Math.PI) * 200 + vis.config.containerWidth / 2 + Math.random())    // need to position them next to each other
-            .attr("cy", Math.sin(3 / 5 * 2 * Math.PI) * 200 + vis.config.containerHeight / 2 + Math.random())
+            .attr('cx', d => +vis.sony_group.attr('x') + Math.random())
+            .attr('cy', d => +vis.sony_group.attr('y') + Math.random())
             .attr("cluster", "Sony");
 
         vis.microsoft_circles = vis.microsoft_group.selectAll(".microsoft-nodes")
@@ -80,8 +95,8 @@ class MainView {
             .transition()
             .attr('class', "microsoft-nodes")
             .attr("r", d => vis.circleRadius(d.global_sales))
-            .attr("cx", Math.cos(4 / 5 * 2 * Math.PI) * 200 + vis.config.containerWidth / 2 + Math.random())
-            .attr("cy", Math.sin(4 / 5 * 2 * Math.PI) * 200 + vis.config.containerHeight / 2 + Math.random())
+            .attr('cx', d => +vis.microsoft_group.attr('x') + Math.random())
+            .attr('cy', d => +vis.microsoft_group.attr('y') + Math.random())
             .attr("cluster", "Microsoft");
 
         vis.nintendo_circles = vis.nintendo_group.selectAll(".nintendo-nodes")
@@ -90,8 +105,8 @@ class MainView {
             .transition()
             .attr('class', "nintendo-nodes")
             .attr("r", d => vis.circleRadius(d.global_sales))
-            .attr("cx", Math.cos(5 / 5 * 2 * Math.PI) * 200 + vis.config.containerWidth / 2 + Math.random())
-            .attr("cy", Math.sin(5 / 5 * 2 * Math.PI) * 200 + vis.config.containerHeight / 2 + Math.random())
+            .attr('cx', d => +vis.nintendo_group.attr('x') + Math.random())
+            .attr('cy', d => +vis.nintendo_group.attr('y') + Math.random())
             .attr("cluster", "nintendo");
 
         vis.pc_circles = vis.pc_group.selectAll(".pc-nodes")
@@ -100,8 +115,8 @@ class MainView {
             .transition()
             .attr('class', "pc-nodes")
             .attr("r", d => vis.circleRadius(d.global_sales))
-            .attr("cx", Math.cos(1 / 5 * 2 * Math.PI) * 200 + vis.config.containerWidth / 2 + Math.random())
-            .attr("cy", Math.sin(1 / 5 * 2 * Math.PI) * 200 + vis.config.containerHeight / 2 + Math.random())
+            .attr('cx', d => +vis.pc_group.attr('x') + Math.random())
+            .attr('cy', d => +vis.pc_group.attr('y') + Math.random())
             .attr("cluster", "pc");
 
         vis.others_circles = vis.others_group.selectAll(".others-nodes")
@@ -110,8 +125,50 @@ class MainView {
             .transition()
             .attr('class', "others-nodes")
             .attr("r", d => vis.circleRadius(d.global_sales))
-            .attr("cx", Math.cos(2 / 5 * 2 * Math.PI) * 200 + vis.config.containerWidth / 2 + Math.random())
-            .attr("cy", Math.sin(2 / 5 * 2 * Math.PI) * 200 + vis.config.containerHeight / 2 + Math.random())
+            .attr('cx', d => +vis.others_group.attr('x') + Math.random())
+            .attr('cy', d => +vis.others_group.attr('y') + Math.random())
             .attr("cluster", "others");
+    }
+
+    // Move d to be adjacent to the cluster node.
+    // from: https://bl.ocks.org/mbostock/7881887
+    cluster() {
+
+        var nodes = d3.selectAll('circle'),
+            strength = 0.1;
+
+        function force(alpha) {
+            alpha *= strength * alpha; // scale + curve alpha value
+            nodes.each(function (d) {
+                console.log(d)
+                var cluster_x = d3.select(this.parentElement).attr('x'),
+                    cluster_y = d3.select(this.parentElement).attr('y');
+                let x = d.x - cluster_x,
+                    y = d.y - cluster_y,
+                    l = Math.sqrt(x * x + y * y),
+                    r = d.radius;
+
+                if (l != r) {
+                    l = (l - r) / l * alpha;
+                    d.x -= x *= l;
+                    d.y -= y *= l;
+                    cluster_x += x;
+                    cluster_y += y;
+                }
+            });
+
+        }
+
+        force.initialize = function (_) {
+            nodes = _;
+        }
+
+        force.strength = _ => {
+            strength = _ == null ? strength : _;
+            return force;
+        };
+
+        return force;
+
     }
 }

@@ -38,6 +38,8 @@ class MainView {
             .attr("x", Math.cos(2 / 5 * 2 * Math.PI) * 200 + vis.config.containerWidth / 2)
             .attr("y", Math.sin(2 / 5 * 2 * Math.PI) * 200 + vis.config.containerHeight / 2);
 
+        vis.padding = 3; // padding within cluster
+
         // Data
         vis.sony_games = vis.data[0];
         vis.microsoft_games = vis.data[1];
@@ -50,12 +52,11 @@ class MainView {
     }
 
     initForce() {
-        let padding = 1; // padding within cluster
         let circles = d3.selectAll('circles');
         this.force = d3.forceSimulation()
             .force("cluster", this.cluster())
             .force('center', d3.forceCenter(this.config.containerWidth / 2, this.config.containerHeight / 2))
-            .force('collide', d3.forceCollide(d => this.circleRadius(d.global_sales) + padding)
+            .force('collide', d3.forceCollide(d => this.circleRadius(d.global_sales) + this.padding)
                 .strength(0.7))
             .on('tick', function (e) {
                 circles
@@ -85,8 +86,8 @@ class MainView {
             .transition()
             .attr('class', "sony-nodes")
             .attr("r", d => vis.circleRadius(d.global_sales))
-            .attr('cx', d => +vis.sony_group.attr('x') + Math.random())
-            .attr('cy', d => +vis.sony_group.attr('y') + Math.random())
+            .attr('cx', d => +vis.sony_group.attr('x') + Math.random() * vis.padding)
+            .attr('cy', d => +vis.sony_group.attr('y') + Math.random() * vis.padding)
             .attr("cluster", "Sony");
 
         vis.microsoft_circles = vis.microsoft_group.selectAll(".microsoft-nodes")
@@ -95,8 +96,8 @@ class MainView {
             .transition()
             .attr('class', "microsoft-nodes")
             .attr("r", d => vis.circleRadius(d.global_sales))
-            .attr('cx', d => +vis.microsoft_group.attr('x') + Math.random())
-            .attr('cy', d => +vis.microsoft_group.attr('y') + Math.random())
+            .attr('cx', d => +vis.microsoft_group.attr('x') + Math.random() * vis.padding)
+            .attr('cy', d => +vis.microsoft_group.attr('y') + Math.random() * vis.padding)
             .attr("cluster", "Microsoft");
 
         vis.nintendo_circles = vis.nintendo_group.selectAll(".nintendo-nodes")
@@ -105,8 +106,8 @@ class MainView {
             .transition()
             .attr('class', "nintendo-nodes")
             .attr("r", d => vis.circleRadius(d.global_sales))
-            .attr('cx', d => +vis.nintendo_group.attr('x') + Math.random())
-            .attr('cy', d => +vis.nintendo_group.attr('y') + Math.random())
+            .attr('cx', d => +vis.nintendo_group.attr('x') + Math.random() * vis.padding)
+            .attr('cy', d => +vis.nintendo_group.attr('y') + Math.random() * vis.padding)
             .attr("cluster", "nintendo");
 
         vis.pc_circles = vis.pc_group.selectAll(".pc-nodes")
@@ -115,8 +116,8 @@ class MainView {
             .transition()
             .attr('class', "pc-nodes")
             .attr("r", d => vis.circleRadius(d.global_sales))
-            .attr('cx', d => +vis.pc_group.attr('x') + Math.random())
-            .attr('cy', d => +vis.pc_group.attr('y') + Math.random())
+            .attr('cx', d => +vis.pc_group.attr('x') + Math.random() * vis.padding)
+            .attr('cy', d => +vis.pc_group.attr('y') + Math.random() * vis.padding)
             .attr("cluster", "pc");
 
         vis.others_circles = vis.others_group.selectAll(".others-nodes")
@@ -125,8 +126,8 @@ class MainView {
             .transition()
             .attr('class', "others-nodes")
             .attr("r", d => vis.circleRadius(d.global_sales))
-            .attr('cx', d => +vis.others_group.attr('x') + Math.random())
-            .attr('cy', d => +vis.others_group.attr('y') + Math.random())
+            .attr('cx', d => +vis.others_group.attr('x') + Math.random() * vis.padding)
+            .attr('cy', d => +vis.others_group.attr('y') + Math.random() * vis.padding)
             .attr("cluster", "others");
     }
 

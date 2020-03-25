@@ -50,18 +50,20 @@ class MainView {
     }
 
     initForce() {
-        let circles = d3.selectAll('circles');
-        this.force = d3.forceSimulation()
-            .force("cluster", this.cluster())
+        let circles = this.svg.selectAll('circle');
+        this.force = d3.forceSimulation(circles)
             .force('center', d3.forceCenter(this.config.containerWidth / 2, this.config.containerHeight / 2))
+            //.force("cluster", this.cluster().strength(0.2))
             .force('collide', d3.forceCollide(d => this.circleRadius(d.global_sales) + this.padding)
                 .strength(0.7))
+            /*
             .on('tick', function (e) {
                 circles
                     .attr('cx', d => d.x)
-                    .attr('cx', d => d.y);
-            })
-            .nodes(circles);
+                    .attr('cy', d => d.y);
+            });
+            */
+            console.log(this.force)
     }
 
     update() {
@@ -140,7 +142,6 @@ class MainView {
         let vis = this;
         vis.svg.selectAll('circle')
             .on('click', d => {
-                console.log(d)
                 if (vis.selectedGame === "") { // if not selected, select it 
                     const localSelected = d.console_company + d.index;
                     d3.select("#" + localSelected)
@@ -189,10 +190,11 @@ class MainView {
 
         function force(alpha) {
             alpha *= strength * alpha; // scale + curve alpha value
-            nodes.each(function (d) {
-                console.log(d)
+            nodes.each(e, d => {
+                console.log(e)
                 var cluster_x = d3.select(this.parentElement).attr('x'),
                     cluster_y = d3.select(this.parentElement).attr('y');
+                    console.log(cluster_x)
                 let x = d.x - cluster_x,
                     y = d.y - cluster_y,
                     l = Math.sqrt(x * x + y * y),

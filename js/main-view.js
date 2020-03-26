@@ -21,29 +21,36 @@ class MainView {
             .attr('width', vis.config.containerWidth)
             .attr('height', vis.config.containerHeight);
 
+        let num_cluster = 5;
+
         vis.sony_group = vis.svg.append('g')
             .attr('class', 'sony')
-            .attr("x", Math.cos(3 / 5 * 2 * Math.PI) * 200 + vis.config.containerWidth / 2)
-            .attr("y", Math.sin(3 / 5 * 2 * Math.PI) * 200 + vis.config.containerHeight / 2);
+            .attr("x", Math.cos(3.25 / num_cluster * 2 * Math.PI) * 250 + vis.config.containerWidth / 2)
+            .attr("y", Math.sin(3.25 / num_cluster * 2 * Math.PI) * 250 + vis.config.containerHeight / 2);
         vis.microsoft_group = vis.svg.append('g')
             .attr('class', 'microsoft')
-            .attr("x", Math.cos(4 / 5 * 2 * Math.PI) * 200 + vis.config.containerWidth / 2)
-            .attr("y", Math.sin(4 / 5 * 2 * Math.PI) * 200 + vis.config.containerHeight / 2);
+            .attr("x", Math.cos(4.25 / num_cluster * 2 * Math.PI) * 250 + vis.config.containerWidth / 2)
+            .attr("y", Math.sin(4.25 / num_cluster * 2 * Math.PI) * 250 + vis.config.containerHeight / 2);
         vis.nintendo_group = vis.svg.append('g')
             .attr('class', 'nintendo')
-            .attr("x", Math.cos(5 / 5 * 2 * Math.PI) * 200 + vis.config.containerWidth / 2)
-            .attr("y", Math.sin(5 / 5 * 2 * Math.PI) * 200 + vis.config.containerHeight / 2);
+            .attr("x", Math.cos(5.25 / num_cluster * 2 * Math.PI) * 250 + vis.config.containerWidth / 2)
+            .attr("y", Math.sin(5.25 / num_cluster * 2 * Math.PI) * 250 + vis.config.containerHeight / 2);
         vis.pc_group = vis.svg.append('g')
             .attr('class', 'pc')
-            .attr("x", Math.cos(1 / 5 * 2 * Math.PI) * 200 + vis.config.containerWidth / 2)
-            .attr("y", Math.sin(1 / 5 * 2 * Math.PI) * 200 + vis.config.containerHeight / 2);
+            .attr("x", Math.cos(1.25 / num_cluster * 2 * Math.PI) * 250 + vis.config.containerWidth / 2)
+            .attr("y", Math.sin(1.25 / num_cluster * 2 * Math.PI) * 250 + vis.config.containerHeight / 2);
         vis.others_group = vis.svg.append('g')
             .attr('class', 'others')
-            .attr("x", Math.cos(2 / 5 * 2 * Math.PI) * 200 + vis.config.containerWidth / 2)
-            .attr("y", Math.sin(2 / 5 * 2 * Math.PI) * 200 + vis.config.containerHeight / 2);
+            .attr("x", Math.cos(2.25 / num_cluster * 2 * Math.PI) * 250 + vis.config.containerWidth / 2)
+            .attr("y", Math.sin(2.25 / num_cluster * 2 * Math.PI) * 250 + vis.config.containerHeight / 2);
 
         vis.padding = 3; // padding within cluster
         vis.selectedGame = "";
+
+        // Tooltip Setup
+        vis.div = d3.select('body').append('div')
+            .attr('class', 'tooltip')
+            .attr('style', 'position: absolute; opacity: 0;');
 
         vis.render();
         vis.initForce();
@@ -56,14 +63,14 @@ class MainView {
             //.force("cluster", this.cluster().strength(0.2))
             .force('collide', d3.forceCollide(d => this.circleRadius(d.global_sales) + this.padding)
                 .strength(0.7))
-            /*
-            .on('tick', function (e) {
-                circles
-                    .attr('cx', d => d.x)
-                    .attr('cy', d => d.y);
-            });
-            */
-            console.log(this.force)
+        /*
+        .on('tick', function (e) {
+            circles
+                .attr('cx', d => d.x)
+                .attr('cy', d => d.y);
+        });
+        */
+        console.log(this.force)
     }
 
     update() {
@@ -150,6 +157,17 @@ class MainView {
                         d3.select("#" + d)
                             .style('stroke', '#71361c');
                     });
+                    console.log(d);
+
+                    // Show Game Info in Tooltips
+                    d3.select('.tooltip')
+                        .style('opacity', 1)
+                        .style('left', (vis.config.containerWidth / 2) + 'px')
+                        .style('top', (vis.config.containerHeight / 2) + 'px')
+                        .html("<b>" + d.name + "</b> (" + d.year + ")"
+                            + '<br/>' + d.platform + "  |  " + d.genre
+                            + '<br/> Global Sales: ' + d.global_sales + 'M');
+
                     vis.selectedGame = localSelected;
                 } else if (vis.selectedGame === d.console_company + d.index) { // if selected, unselect it 
                     d3.select("#" + vis.selectedGame)
@@ -158,6 +176,9 @@ class MainView {
                         d3.select("#" + d)
                             .style('stroke', '#ccc');
                     });
+
+                    d3.select('.tooltip').style('opacity', 0);  // Hide tooltips
+
                     vis.selectedGame = "";
                 }
 
@@ -194,7 +215,7 @@ class MainView {
                 console.log(e)
                 var cluster_x = d3.select(this.parentElement).attr('x'),
                     cluster_y = d3.select(this.parentElement).attr('y');
-                    console.log(cluster_x)
+                console.log(cluster_x)
                 let x = d.x - cluster_x,
                     y = d.y - cluster_y,
                     l = Math.sqrt(x * x + y * y),

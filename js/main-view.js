@@ -39,6 +39,7 @@ class MainView {
             .attr('class', 'pc')
             .attr("x", Math.cos(1.25 / num_cluster * 2 * Math.PI) * 250 + vis.config.containerWidth / 2)
             .attr("y", Math.sin(1.25 / num_cluster * 2 * Math.PI) * 250 + vis.config.containerHeight / 2);
+
         vis.others_group = vis.svg.append('g')
             .attr('class', 'others')
             .attr("x", Math.cos(2.25 / num_cluster * 2 * Math.PI) * 250 + vis.config.containerWidth / 2)
@@ -162,7 +163,7 @@ class MainView {
                     // Show Game Info in Tooltips
                     d3.select('.tooltip')
                         .style('opacity', 1)
-                        .style('left', (vis.config.containerWidth / 2) + 'px')
+                        .style('left', (vis.config.containerWidth / 2) + 'px') // TODO : fix middle anchor
                         .style('top', (vis.config.containerHeight / 2) + 'px')
                         .html("<b>" + d.name + "</b> (" + d.year + ")"
                             + '<br/>' + d.platform + "  |  " + d.genre

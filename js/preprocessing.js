@@ -23,7 +23,7 @@ d3.csv("data/games.csv").then(data => {
             game.jp_sales = +d.JP_Sales;
             game.other_sales = +d.Other_Sales;
             game.global_sales = +d.Global_Sales;
-            game.index = i;
+            game.id_num = i;
 
             // Add platform_company column
             if (d.Platform.match(/^(PS|PS2|PS3|PS4|PSP|PSV)$/)) {
@@ -41,11 +41,12 @@ d3.csv("data/games.csv").then(data => {
         return games;
     }
     const mainViewdata = formatDataForMain();
-    mainView.sony_data = mainViewdata[0];
-    mainView.microsoft_data = mainViewdata[1];
-    mainView.nintendo_data = mainViewdata[2];
-    mainView.pc_data = mainViewdata[3];
-    mainView.others_data = mainViewdata[4];
+    const year = 2001;
+    mainView.sony_data = mainViewdata[0].filter(d => d.year === year);
+    mainView.microsoft_data = mainViewdata[1].filter(d => d.year === year);
+    mainView.nintendo_data = mainViewdata[2].filter(d => d.year === year);
+    mainView.pc_data = mainViewdata[3].filter(d => d.year === year);
+    mainView.others_data = mainViewdata[4].filter(d => d.year === year);
     mainView.salesMax = salesMax;
     mainView.salesMin = salesMin;
     mainView.initVis();

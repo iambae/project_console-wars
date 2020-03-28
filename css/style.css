@@ -6,5 +6,10 @@ rect.selected {
 }
 
 rect:not(.selected) {
-  display: none;
+  fill: yellow;
+}
+
+div#controllers {
+  display: flex;
+  flex-direction: column;
 }

@@ -1,13 +1,26 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>Console War</title>
-</head>
-<body>
-    
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <span id="clear">[clear]</span>
+    <svg id="canvas"></svg>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://d3js.org/topojson.v3.min.js"></script>
     <script src="https://d3js.org/d3.v5.min.js"></script>
-    <script src="js/preprocessing.js"></script>
-</body>
+    <script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
+    <script src="https://d3js.org/d3-quadtree.v1.min.js"></script>
+    <script src="https://d3js.org/d3-timer.v1.min.js"></script>
+    <script src="https://d3js.org/d3-force.v2.min.js"></script>
+    <!-- <script>
+      "var simulation = d3.forceSimulation(nodes)"
+
+    </script> -->
+    <script type="module" src="js/preprocessing.js"></script>
+    <script type="module" src="js/canvas.js"></script>
+    <script type="module" src="js/game-controller-view.js"></script>
+    <script type="module" src="js/index.js"></script>
+  </body>
 </html>

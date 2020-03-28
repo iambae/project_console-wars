@@ -1,0 +1,10 @@
+rect {
+  fill: red;
+}
+rect.selected {
+  fill: steelblue;
+}
+
+rect:not(.selected) {
+  display: none;
+}

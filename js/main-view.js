@@ -12,13 +12,13 @@ class MainView {
 			}
 		};
 
-		this.widgetPane = widgetPane;
-
 		this.sony_data = [];
 		this.microsoft_data = [];
 		this.nintendo_data = [];
 		this.pc_data = [];
 		this.others_data = [];
+
+		this.widgetPane = widgetPane;
 	}
 
 	initVis() {
@@ -107,6 +107,14 @@ class MainView {
 			.concat(vis.pc_data)
 			.concat(vis.others_data);
 
+		vis.filteredData = {
+			sony: this.filterGame(this.sony_data),
+			microsoft: this.filterGame(this.microsoft_data),
+			nintendo: this.filterGame(this.nintendo_data),
+			pc: this.filterGame(this.pc_data),
+			others: this.filterGame(this.others_data)
+		};
+
 		// Tooltip Setup
 		vis.div = d3
 			.select("body")
@@ -119,7 +127,18 @@ class MainView {
 		vis.initForce();
 	}
 
+	filterGame(gameArr) {
+		if (gameArr.length == 0) return gameArr;
+		return _.filter(
+			gameArr,
+			game => game.genre == this.widgetPane.selectedOption
+			// &&
+			// _.includes(this.widgetPane.selectedYears, game.year)
+		);
+	}
+
 	initForce() {
+		const allCircles = d3.selectAll("circle");
 		this.force = d3
 			.forceSimulation(this.allData)
 			.force(
@@ -140,17 +159,20 @@ class MainView {
 					.strength(0.7)
 			)
 			.on("tick", function() {
-				d3.selectAll("circle")
-					.attr("cx", d => d.x)
-					.attr("cy", d => d.y);
+				allCircles.attr("cx", d => d.x).attr("cy", d => d.y);
 			});
 	}
 
 	update() {
 		let vis = this;
 
-		// update vis.sony_data, vis.microsoft_data, etc.
-		console.log(vis.widgetPane.selectedOption);
+		vis.filteredData = {
+			sony: this.filterGame(vis.sony_data),
+			microsoft: this.filterGame(vis.microsoft_data),
+			nintendo: this.filterGame(vis.nintendo_data),
+			pc: this.filterGame(vis.pc_data),
+			others: this.filterGame(vis.others_data)
+		};
 
 		vis.render();
 	}
@@ -165,7 +187,7 @@ class MainView {
 
 		vis.sony_circles = vis.sony_group
 			.selectAll(".sony-nodes")
-			.data(vis.sony_data)
+			.data(vis.filteredData["sony"])
 			.join("circle")
 			.transition()
 			.attr("class", "sony-nodes")
@@ -183,7 +205,7 @@ class MainView {
 
 		vis.microsoft_circles = vis.microsoft_group
 			.selectAll(".microsoft-nodes")
-			.data(vis.microsoft_data)
+			.data(vis.filteredData["microsoft"])
 			.join("circle")
 			.transition()
 			.attr("class", "microsoft-nodes")
@@ -203,7 +225,7 @@ class MainView {
 
 		vis.nintendo_circles = vis.nintendo_group
 			.selectAll(".nintendo-nodes")
-			.data(vis.nintendo_data)
+			.data(vis.filteredData["nintendo"])
 			.join("circle")
 			.transition()
 			.attr("class", "nintendo-nodes")
@@ -221,7 +243,7 @@ class MainView {
 
 		vis.pc_circles = vis.pc_group
 			.selectAll(".pc-nodes")
-			.data(vis.pc_data)
+			.data(vis.filteredData["pc"])
 			.join("circle")
 			.transition()
 			.attr("class", "pc-nodes")
@@ -239,7 +261,7 @@ class MainView {
 
 		vis.others_circles = vis.others_group
 			.selectAll(".others-nodes")
-			.data(vis.others_data)
+			.data(vis.filteredData["others"])
 			.join("circle")
 			.transition()
 			.attr("class", "others-nodes")
@@ -337,8 +359,9 @@ class MainView {
 		function force(alpha) {
 			alpha *= strength * alpha; // scale + curve alpha value
 			nodes.forEach(d => {
-				var cluster_x = d3.select("." + d.console_company).attr("x"),
-					cluster_y = d3.select("." + d.console_company).attr("y");
+				const group = d3.select("." + d.console_company);
+				var cluster_x = group.attr("x"),
+					cluster_y = group.attr("y");
 
 				let x = d.x - cluster_x,
 					y = d.y - cluster_y,

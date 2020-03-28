@@ -17,13 +17,12 @@ preprocessor.then(processedData => {
 
 	const widgetPane = new WidgetPane({ parentElement: "#widgets" });
 
+	widgetPane.mainView = mainView;
 	widgetPane.yearList = _.uniq(_.map(allGames, "year"))
 		.filter(year => !Number.isNaN(year))
 		.sort();
-
-	widgetPane.genreList = _.uniq(_.map(allGames, "genre"))
-		.concat("All")
-		.sort();
+	widgetPane.genreList = _.uniq(_.map(allGames, "genre")).sort();
+	widgetPane.selectedOption = widgetPane.genreList[0];
 
 	widgetPane.initVis();
 

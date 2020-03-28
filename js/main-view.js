@@ -54,19 +54,20 @@ class MainView {
         vis.div = d3.select('body').append('div')
             .attr('class', 'tooltip')
             .attr('style', 'position: fixed; opacity: 0;');
-        vis.widthCenterPercent = 41.5
+        vis.widthCenterPercent = 41.5;
 
         vis.render();
         vis.initForce();
     }
 
     initForce() {
+        const allCircles = d3.selectAll('circle');
         this.force = d3.forceSimulation(this.allData)
             .force('center', d3.forceCenter(this.config.containerWidth * (1 - this.widthCenterPercent / 100), this.config.containerHeight / 2))
             .force("cluster", this.cluster().strength(0.2))
             .force('collide', d3.forceCollide(d => this.circleRadius(d.global_sales) + this.padding).strength(0.7))
             .on('tick', function () {
-                d3.selectAll('circle')
+                allCircles
                     .attr('cx', d => d.x)
                     .attr('cy', d => d.y);
             });
@@ -212,8 +213,9 @@ class MainView {
         function force(alpha) {
             alpha *= strength * alpha; // scale + curve alpha value
             nodes.forEach(d => {
-                var cluster_x = d3.select("." + d.console_company).attr('x'),
-                    cluster_y = d3.select("." + d.console_company).attr('y');
+                const group = d3.select("." + d.console_company);
+                var cluster_x = group.attr('x'),
+                    cluster_y = group.attr('y');
 
                 let x = d.x - cluster_x,
                     y = d.y - cluster_y,

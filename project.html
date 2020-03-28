@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html>
+	<head>
+		<title>Console War</title>
+		<link rel="stylesheet" href="css/style.css" />
+	</head>
 
-<head>
-  <title>Console War</title>
-  <link rel="stylesheet" href="css/style.css">
-</head>
-
-<body>
-
-  <div>
-    <svg id="main">
-
-    </svg>
-  </div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-  <script src="https://d3js.org/topojson.v3.min.js"></script>
-  <script src="https://d3js.org/d3.v5.min.js"></script>
-  <script src="js/main-view.js"></script>
-  <script src="js/preprocessing.js"></script>
-</body>
-
+	<body>
+		<div>
+			<div id="widgets"></div>
+			<svg id="main"></svg>
+		</div>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/crossfilter/1.3.12/crossfilter.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+		<script src="https://d3js.org/topojson.v3.min.js"></script>
+		<script src="https://d3js.org/d3.v5.min.js"></script>
+		<script src="js/main-view.js"></script>
+		<script type="module" src="js/widget-pane.js"></script>
+		<script type="module" src="js/preprocessor.js"></script>
+		<script type="module" src="js/index.js"></script>
+	</body>
 </html>

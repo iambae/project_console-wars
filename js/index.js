@@ -7,11 +7,11 @@ preprocessor.then(processedData => {
 	const { mainViewData, salesMax, salesMin } = processedData;
 	const allGames = _.flatMap(mainViewData);
 
-	mainView.sony_data = mainViewData[0].slice(0, 100);
-	mainView.microsoft_data = mainViewData[1].slice(0, 100);
-	mainView.nintendo_data = mainViewData[2].slice(0, 100);
-	mainView.pc_data = mainViewData[3].slice(0, 100);
-	mainView.others_data = mainViewData[4].slice(0, 100);
+	mainView.sony_data = mainViewData[0];
+	mainView.microsoft_data = mainViewData[1];
+	mainView.nintendo_data = mainViewData[2];
+	mainView.pc_data = mainViewData[3];
+	mainView.others_data = mainViewData[4];
 	mainView.salesMax = salesMax;
 	mainView.salesMin = salesMin;
 

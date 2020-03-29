@@ -1,0 +1,77 @@
+[33mcommit 08e15fcbb42c16c70239a9a70e22572ffad28506[m[33m ([m[1;36mHEAD -> [m[1;32mnicole[m[33m)[m
+Author: jhnbae7 <jhnbae7@students.cs.ubc.ca>
+Date:   Sat Mar 28 01:40:35 2020 -0700
+
+    Stumped on dateSlider
+
+[33mcommit bd581528c2eb70e87e4fb3ac42dfba60232629c3[m
+Author: jhnbae7 <jhnbae7@students.cs.ubc.ca>
+Date:   Fri Mar 27 17:33:21 2020 -0700
+
+    Refactor codebase & added widget pane
+
+[33mcommit e77e9553fc574a98d2a3b0f8c768f1f7879814b1[m
+Author: Wesley Yuen <wesleywh@students.cs.ubc.ca>
+Date:   Wed Mar 25 11:09:06 2020 -0700
+
+    cant get it to work
+
+[33mcommit 34562efbe801a3505986d2bf1095833c6e563d1a[m
+Author: Wesley Yuen <wesleywh@students.cs.ubc.ca>
+Date:   Wed Mar 25 01:10:29 2020 -0700
+
+    able to select a game and the same game released in other console_company will also be highlighted in a different color
+
+[33mcommit 57b23ab4971b65c18053602ae124c85c837fa91f[m
+Author: Wesley Yuen <wesleywh@students.cs.ubc.ca>
+Date:   Sun Mar 22 15:59:20 2020 -0700
+
+    added css
+
+[33mcommit 90aa1c016d466ff5880814b8115d08929013f882[m
+Author: Wesley Yuen <wesleywh@students.cs.ubc.ca>
+Date:   Sun Mar 22 11:49:40 2020 -0700
+
+    fix placing each nodes in random location around cluster, but force still not working
+
+[33mcommit e389c06353dba2d73d993905d920dfeee536bf89[m
+Author: Wesley Yuen <wesleywh@students.cs.ubc.ca>
+Date:   Sat Mar 21 18:47:58 2020 -0700
+
+    formed clusters, but overlapped
+
+[33mcommit 661436cd4596295e80d6c667b76bcdece612c88e[m
+Author: Megha Singhania <meghasinghania999@gmail.com>
+Date:   Sat Mar 21 12:11:41 2020 -0700
+
+    Fixes to syntax error
+
+[33mcommit 2cd94375e517146174271779c1598761b9fe27e8[m
+Author: Wesley Yuen <wesleywh@students.cs.ubc.ca>
+Date:   Sat Mar 21 12:13:57 2020 -0700
+
+    change back postprocessing for main view, before merge
+
+[33mcommit 03ef135e651b2c322a080bb47d28eacb5b3c976b[m
+Author: Wesley Yuen <wesleywh@students.cs.ubc.ca>
+Date:   Fri Mar 20 16:00:56 2020 -0700
+
+    started something
+
+[33mcommit e1f7d6a1a25090ad7a3e808f50bb6c3b04b027ff[m
+Author: Wesley Yuen <wesleywh@students.cs.ubc.ca>
+Date:   Fri Mar 13 18:55:51 2020 -0700
+
+    grouped games already released on other platform into 1 item
+
+[33mcommit a6deacb44b84e595ea6eabd2101a1df387fa2ecf[m
+Author: UBC Student <wesleywh@students.cs.ubc.ca>
+Date:   Thu Mar 12 22:31:30 2020 -0700
+
+    Add Data and preprocessing js file
+
+[33mcommit 5e68724ad044e5316c65f508d63154c27f4158ba[m
+Author: UBC Student <opperman@students.cs.ubc.ca>
+Date:   Fri Feb 14 09:14:07 2020 -0800
+
+    Initial commit

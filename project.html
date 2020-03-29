@@ -2,21 +2,39 @@
 <html>
 	<head>
 		<title>Console War</title>
+		<link
+			rel="stylesheet"
+			href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+			integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+			crossorigin="anonymous"
+		/>
 		<link rel="stylesheet" href="css/style.css" />
 	</head>
 
 	<body>
-		<div>
-			<div id="widgets"></div>
-			<svg id="main"></svg>
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-6 view-col">
+					<div id="widgets">
+						<svg id="year-chart" width="600" height="500"></svg>
+					</div>
+				</div>
+				<div class="col-lg-6 view-col">
+					<svg id="main"></svg>
+				</div>
+			</div>
 		</div>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-		<script src="https://d3js.org/topojson.v3.min.js"></script>
 		<script src="https://d3js.org/d3.v5.min.js"></script>
-		<script src="js/main-view.js"></script>
-		<script type="module" src="js/widget-pane.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+		<script
+			src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.0/js/bootstrap.min.js"
+			type="text/javascript"
+		></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js"></script>
+		<script src="https://d3js.org/topojson.v3.min.js"></script>
 		<script type="module" src="js/preprocessor.js"></script>
 		<script type="module" src="js/index.js"></script>
+		<script src="js/main-view.js"></script>
+		<script type="module" src="js/widget-pane.js"></script>
 	</body>
 </html>

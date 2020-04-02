@@ -14,12 +14,11 @@ export default class WidgetPane {
 			}
 		};
 
-		this.mainView = mainView;
-
 		this.genreList = [];
-		this.selectedOption = "Action";
+		this.selectedOption = "";
 		this.yearList = [];
-		this.selectedYears = this.yearList; // redyce the default years selected by brush
+		this.selectedYears = [];
+		this.mainView = mainView;
 	}
 
 	initVis() {
@@ -31,13 +30,13 @@ export default class WidgetPane {
 			.attr("height", vis.config.containerHeight);
 
 		// Add genreDropdown to wiget pane
-		vis.genre_dropdown = vis.div.insert("div", "#year-chart").attr("id", "dropdown");
+		vis.genre_dropdown = vis.div.insert("div", ".header.years").attr("id", "dropdown");
 
 		// Add year slider to wiget pane
 		vis.year_chart = d3
 			.select("#year-chart")
 			.append("g")
-			.attr("transform", "translate(50, 120)");
+			.attr("transform", "translate(40, 390)");
 
 		vis.histogramSlider();
 
@@ -74,7 +73,7 @@ export default class WidgetPane {
 			margin: {
 				top: 20,
 				bottom: 20,
-				left: 20,
+				left: 0,
 				right: 20
 			},
 			bucketSize: 5,
@@ -115,7 +114,7 @@ export default class WidgetPane {
 			.attr("y", height - 110)
 			.attr("width", width / (range[1] - range[0]))
 			.attr("height", 110)
-			.style("fill", "#888888");
+			.style("fill", "#BEBEBE");
 
 		bar.append("text")
 			.attr("class", "label")
@@ -137,16 +136,16 @@ export default class WidgetPane {
 			.on("brush", function() {
 				let s = d3.event.selection;
 
-				// update and move labels
-				// update and move labels
+				// Update and move labels
 				const startYear = Math.round(xScale.invert(s[0]));
 				const endYear = Math.round(xScale.invert(s[1])) - 1;
 
 				vis.selectedYears = [startYear, endYear];
 
-				// move brush handles
+				// Move brush handles
 				handle.attr("display", null).attr("transform", (d, i) => "translate(" + [s[i], -height / 4] + ")");
-				// update view
+
+				// Update view;
 				// if the view should only be updated after brushing is over,
 				// move these two lines into the on('end') part below
 				vis.year_chart.node().value = s.map(d => bucketSize * Math.round(xScale.invert(d)));
@@ -163,13 +162,13 @@ export default class WidgetPane {
 				vis.update();
 			});
 
-		// append brush to g
+		// Append brush to g
 		let gBrush = vis.year_chart
 			.append("g")
 			.attr("class", "brush")
 			.call(brush);
 
-		// add brush handles (from https://bl.ocks.org/Fil/2d43867ba1f36a05459c7113c7f6f98a)
+		// Add brush handles (from https://bl.ocks.org/Fil/2d43867ba1f36a05459c7113c7f6f98a)
 		let brushResizePath = function(d) {
 			let e = +(d.type == "e"),
 				x = e ? 1 : -1,
@@ -190,20 +189,21 @@ export default class WidgetPane {
 			.enter()
 			.append("path")
 			.attr("class", "handle--custom")
-			.attr("stroke", "#888")
-			.attr("fill", "#eee")
+			.attr("stroke", "#FFFFFF")
+			.attr("fill", "#EEEEEE")
 			.attr("cursor", "ew-resize")
 			.attr("d", brushResizePath);
 
-		// override default behaviour - clicking outside of the selected area
+		// Override default behaviour - clicking outside of the selected area
 		// will select a small piece there rather than deselecting everything
-		// https://bl.ocks.org/mbostock/6498000
+		// (from https://bl.ocks.org/mbostock/6498000)
 		gBrush
 			.selectAll(".overlay")
 			.each(function(d) {
 				d.type = "selection";
 			})
-			.on("mousedown touchstart", brushcentered);
+			.on("mousedown touchstart", brushcentered)
+			.style("pointer-events", "none");
 
 		function brushcentered() {
 			let dx = x(1) - x(0), // Use a fixed width when recentering
@@ -213,18 +213,8 @@ export default class WidgetPane {
 			d3.select(this.parentNode).call(brush.move, x1 > width ? [width - dx, width] : x0 < 0 ? [0, dx] : [x0, x1]);
 		}
 
-		// select entire range
+		// Select default range
 		gBrush.call(brush.move, [vis.selectedYears[0], vis.selectedYears[1]].map(xScale));
-
-		// select default range
-		gBrush.call(
-			brush.move,
-			defaultRange
-				.map(d => width * (d / 100))
-				.map(xScale.invert)
-				.map(Math.round)
-				.map(xScale)
-		);
 
 		return vis.year_chart.node();
 	}

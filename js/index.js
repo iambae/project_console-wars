@@ -2,6 +2,7 @@ import { preprocessor } from "./preprocessor.js";
 import WidgetPane from "./widget-pane.js";
 
 const mainView = new MainView({ parentElement: "#main" });
+const widgetPane = new WidgetPane({ parentElement: "#widgets" }, mainView);
 
 preprocessor.then(processedData => {
 	const { mainViewData, salesMax, salesMin } = processedData;
@@ -15,16 +16,12 @@ preprocessor.then(processedData => {
 	mainView.salesMax = salesMax;
 	mainView.salesMin = salesMin;
 
-	const widgetPane = new WidgetPane({ parentElement: "#widgets" });
-
-	widgetPane.mainView = mainView;
+	widgetPane.genreList = _.uniq(_.map(allGames, "genre")).sort();
+	widgetPane.selectedOption = widgetPane.genreList[8];
 	widgetPane.yearList = _.uniq(_.map(allGames, "year"))
 		.filter(year => !Number.isNaN(year))
 		.sort();
-
-	widgetPane.genreList = _.uniq(_.map(allGames, "genre")).sort();
-	widgetPane.selectedOption = widgetPane.genreList[0];
-
+	widgetPane.selectedYears = [2011, 2017];
 	widgetPane.initVis();
 
 	mainView.widgetPane = widgetPane;

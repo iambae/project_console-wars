@@ -3,6 +3,26 @@ body {
 	width: 100%;
 }
 
+.header {
+	padding: 20px;
+	margin-left: 30px;
+}
+
+.header.years {
+	margin-top: 50px;
+}
+
+svg#year-chart {
+	-ms-transform: rotate(90deg);
+	transform: rotate(90deg);
+	width: 600px;
+	height: 500px;
+}
+
+svg#main {
+	width: 150%;
+}
+
 circle {
 	stroke: #ccc;
 	fill: #fff;
@@ -58,8 +78,8 @@ rect.overlay {
 
 rect.selection {
 	stroke: none;
-	fill: steelblue;
-	fill-opacity: 0.4;
+	fill: white;
+	fill-opacity: 0.2;
 }
 
 .label {

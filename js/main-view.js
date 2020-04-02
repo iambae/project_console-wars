@@ -1,5 +1,5 @@
 class MainView {
-	constructor(_config, widgetPane) {
+	constructor(_config) {
 		this.config = {
 			parentElement: _config.parentElement,
 			containerWidth: _config.containerWidth || 1000,
@@ -17,8 +17,6 @@ class MainView {
 		this.nintendo_data = [];
 		this.pc_data = [];
 		this.others_data = [];
-
-		this.widgetPane = widgetPane;
 	}
 
 	initVis() {
@@ -60,12 +58,6 @@ class MainView {
 		vis.padding = 2; // padding within cluster
 		vis.selectedGame = "";
 
-		vis.allData = vis.sony_data
-			.concat(vis.microsoft_data)
-			.concat(vis.nintendo_data)
-			.concat(vis.pc_data)
-			.concat(vis.others_data);
-
 		vis.filteredData = {
 			sony: this.filterGame(this.sony_data),
 			microsoft: this.filterGame(this.microsoft_data),
@@ -99,7 +91,7 @@ class MainView {
 	initForce() {
 		const allCircles = d3.selectAll("circle");
 		this.force = d3
-			.forceSimulation(this.allData)
+			.forceSimulation(_.flatten(_.values(this.filteredData)))
 			.force(
 				"center",
 				d3.forceCenter(

@@ -118,6 +118,7 @@ class MainView {
 		};
 
 		vis.render();
+		vis.initForce();
 	}
 
 	render() {
@@ -197,7 +198,7 @@ class MainView {
 			if (vis.selectedGame === "") {
 				// if not selected, select it
 				const localSelected = d.console_company + d.id_num;
-
+				
 				d3.select("#" + localSelected).style("stroke", "#b35227");
 				vis.getRelatedIDs(d.name, d.console_company).forEach(d => {
 					d3.select("#" + d).style("stroke", "#71361c");
@@ -207,9 +208,8 @@ class MainView {
 				d3.select(".tooltip")
 					.style("opacity", 1)
 					.style("top", "400px")
-					.style("left", "600px") // TODO: hardcoded
-					.html(
-						"<b>" +
+					.style("left", "845px") // TODO: hardcoded
+					.html("<b>" +
 							d.name +
 							"</b> (" +
 							d.year +

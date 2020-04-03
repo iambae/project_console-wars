@@ -118,6 +118,7 @@ class MainView {
 		};
 
 		vis.render();
+		vis.initForce();
 	}
 
 	render() {
@@ -207,7 +208,7 @@ class MainView {
 				d3.select(".tooltip")
 					.style("opacity", 1)
 					.style("top", "400px")
-					.style("left", "600px") // TODO: hardcoded
+					.style("left", "850px") // TODO: hardcoded
 					.html(
 						"<b>" +
 							d.name +

@@ -38,7 +38,7 @@ export const preprocessor = d3.csv("data/games.csv").then(data => {
 			game.other_sales = +d.Other_Sales;
 			game.global_sales = +d.Global_Sales;
 			game.crit_score = +d.Critic_Score;
-			game.user_score = +d.User_Score / 10;
+			game.user_score = +d.User_Score * 10;
 			game.id_num = i;
 
 			// Add platform_company column

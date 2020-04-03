@@ -198,7 +198,7 @@ class MainView {
 			if (vis.selectedGame === "") {
 				// if not selected, select it
 				const localSelected = d.console_company + d.id_num;
-				console.log(d);
+				
 				d3.select("#" + localSelected).style("stroke", "#b35227");
 				vis.getRelatedIDs(d.name, d.console_company).forEach(d => {
 					d3.select("#" + d).style("stroke", "#71361c");

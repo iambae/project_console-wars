@@ -36,7 +36,7 @@ export const preprocessor = d3.csv("data/games.csv").then(data => {
 			game.jp_sales = +d.JP_Sales;
 			game.other_sales = +d.Other_Sales;
 			game.global_sales = +d.Global_Sales;
-			game.index = i;
+			game.id_num = i;
 
 			// Add platform_company column
 			if (d.Platform.match(/^(PS|PS2|PS3|PS4|PSP|PSV)$/)) {

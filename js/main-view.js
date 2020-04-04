@@ -25,7 +25,7 @@ class MainView {
 		vis.svg = d3
 			.select(vis.config.parentElement)
 			.attr("width", "100%")
-			.attr("height", 800);
+			.attr("height", 900);
 
 		let num_cluster = 5;
 
@@ -67,12 +67,21 @@ class MainView {
 		};
 
 		// Tooltip Setup
-		vis.div = d3
-			.select("body")
+		vis.div = d3.select("body")
 			.append("div")
 			.attr("class", "tooltip")
 			.attr("style", "position: fixed; opacity: 0;");
 		vis.widthCenterPercent = 41.5;
+
+		vis.circleRadius = d3.scaleLinear()
+			.domain([vis.salesMin, vis.salesMax])
+			.range([5, 90]);
+
+		// Color scale
+		vis.critics_colorScale = d3.scaleQuantile()
+			.domain([vis.criticMin, vis.criticMax])
+			.range(d3.schemeBlues[9]);
+
 
 		vis.render();
 		vis.initForce();
@@ -101,7 +110,7 @@ class MainView {
 			)
 			.force("cluster", this.cluster().strength(0.2))
 			.force("collide", d3.forceCollide(d => this.circleRadius(d.global_sales) + this.padding).strength(0.7))
-			.on("tick", function() {
+			.on("tick", function () {
 				allCircles.attr("cx", d => d.x).attr("cy", d => d.y);
 			});
 	}
@@ -123,11 +132,6 @@ class MainView {
 
 	render() {
 		let vis = this;
-
-		vis.circleRadius = d3
-			.scaleLinear()
-			.domain([vis.salesMin, vis.salesMax])
-			.range([5, 90]);
 
 		vis.sony_circles = vis.sony_group
 			.selectAll(".sony-nodes")
@@ -190,6 +194,7 @@ class MainView {
 			.attr("cluster", "others");
 
 		vis.handleSelection();
+		vis.handleColor();
 	}
 
 	handleSelection() {
@@ -198,10 +203,14 @@ class MainView {
 			if (vis.selectedGame === "") {
 				// if not selected, select it
 				const localSelected = d.console_company + d.id_num;
-				
-				d3.select("#" + localSelected).style("stroke", "#b35227");
+
+				d3.select("#" + localSelected)
+					.style("stroke", "#FF4F00")
+					.style("stroke-width", "3px");
 				vis.getRelatedIDs(d.name, d.console_company).forEach(d => {
-					d3.select("#" + d).style("stroke", "#71361c");
+					d3.select("#" + d)
+						.style("stroke", "#FF7538")
+						.style("stroke-width", "3px");
 				});
 
 				// Show Game Info in Tooltips
@@ -210,25 +219,26 @@ class MainView {
 					.style("top", "400px")
 					.style("left", "845px") // TODO: hardcoded
 					.html("<b>" +
-							d.name +
-							"</b> (" +
-							d.year +
-							")" +
-							"<br/>" +
-							d.platform +
-							"  |  " +
-							d.genre +
-							"<br/> Global Sales: " +
-							d.global_sales +
-							"M"
+						d.name +
+						"</b> (" +
+						d.year +
+						")" +
+						"<br/>" +
+						d.platform +
+						"  |  " +
+						d.genre +
+						"<br/> Global Sales: " +
+						d.global_sales +
+						"M"
 					);
 
 				vis.selectedGame = localSelected;
 			} else if (vis.selectedGame === d.console_company + d.id_num) {
 				// if selected, unselect it
-				d3.select("#" + vis.selectedGame).style("stroke", "#ccc");
+				d3.select("#" + vis.selectedGame)
+					.style("stroke-width", "0px");
 				vis.getRelatedIDs(d.name, d.console_company).forEach(d => {
-					d3.select("#" + d).style("stroke", "#ccc");
+					d3.select("#" + d).style("stroke-width", "0px");
 				});
 
 				d3.select(".tooltip").style("opacity", 0); // Hide tooltips
@@ -237,6 +247,7 @@ class MainView {
 			}
 		});
 	}
+
 
 	getRelatedIDs(name, company) {
 		let relatedIDs = [];
@@ -258,6 +269,14 @@ class MainView {
 			relatedIDs.push(o_result.console_company + o_result.id_num);
 
 		return relatedIDs;
+	}
+
+	handleColor() {
+		let vis = this;
+		d3.selectAll('circle')
+			.attr('fill', d => {
+				return vis.critics_colorScale(d.crit_score);
+			});
 	}
 
 	// Move d to be adjacent to the cluster node.
@@ -289,7 +308,7 @@ class MainView {
 			});
 		}
 
-		force.initialize = function(_) {
+		force.initialize = function (_) {
 			nodes = _;
 		};
 

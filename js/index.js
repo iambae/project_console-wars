@@ -5,7 +5,7 @@ const mainView = new MainView({ parentElement: "#main" });
 const widgetPane = new WidgetPane({ parentElement: "#widgets" }, mainView);
 
 preprocessor.then(processedData => {
-	const { mainViewData, salesMax, salesMin } = processedData;
+	const { mainViewData, salesMax, salesMin, criticMax, criticMin, userMax, userMin} = processedData;
 	const allGames = _.flatMap(mainViewData);
 
 	mainView.sony_data = mainViewData[0];
@@ -15,8 +15,13 @@ preprocessor.then(processedData => {
 	mainView.others_data = mainViewData[4];
 	mainView.salesMax = salesMax;
 	mainView.salesMin = salesMin;
+	mainView.criticMax = criticMax;
+	mainView.criticMin = criticMin;
+	mainView.userMax = userMax;
+	mainView.userMin = userMin;
 
 	widgetPane.genreList = _.uniq(_.map(allGames, "genre")).sort();
+	widgetPane.scoreList = ["Critics", "Users", "Both"];
 	widgetPane.selectedOption = widgetPane.genreList[8];
 	widgetPane.yearList = _.uniq(_.map(allGames, "year"))
 		.filter(year => !Number.isNaN(year))

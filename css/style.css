@@ -23,12 +23,6 @@ svg#main {
 	width: 150%;
 }
 
-circle {
-	stroke: #ccc;
-	fill: #fff;
-	stroke-width: 3px;
-}
-
 div.view-col {
 	padding-left: 0px;
 }
@@ -41,7 +35,7 @@ div.tooltip {
 	padding: 2px;
 	font: 12px sans-serif;
 	background: lightsteelblue;
-	border: 0px;
+	border: 2px;
 	border-radius: 8px;
 	pointer-events: none;
 }

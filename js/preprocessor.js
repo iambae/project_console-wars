@@ -46,9 +46,7 @@ export const preprocessor = d3.csv("data/games.csv").then(data => {
 			} else if (d.Platform.match(/^(XB|X360|XOne)$/)) {
 				game.console_company = "microsoft";
 				games[1].push(game);
-			} else if (
-				d.Platform.match(/^(3DS|DS|GB|GBA|GC|N64|NES|SNES|Wii|WiiU)$/)
-			) {
+			} else if (d.Platform.match(/^(3DS|DS|GB|GBA|GC|N64|NES|SNES|Wii|WiiU)$/)) {
 				game.console_company = "nintendo";
 				games[2].push(game);
 			} else if (d.Platform == "PC") {

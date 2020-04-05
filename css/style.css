@@ -8,15 +8,37 @@ body {
 	margin-left: 30px;
 }
 
-.header.years {
-	margin-top: 50px;
+.header > p {
+	font-weight: bold;
+	text-transform: uppercase;
 }
 
-svg#year-chart {
+.header.crit-score {
+	margin-top: 10px;
+}
+
+div#dates-bars {
+	transform: translate(50, 200);
+}
+
+div.score-chart {
 	-ms-transform: rotate(90deg);
 	transform: rotate(90deg);
-	width: 600px;
-	height: 500px;
+	width: 400px;
+	height: 300px;
+	position: absolute;
+	top: 180px;
+	left: -90px;
+}
+
+div#user.score-chart {
+	top: 130px;
+	left: 80px;
+}
+
+div.score-chart svg {
+	width: 500px;
+	height: 300px;
 }
 
 svg#main {
@@ -71,9 +93,9 @@ rect.overlay {
 }
 
 rect.selection {
-	stroke: none;
+	stroke: white;
 	fill: white;
-	fill-opacity: 0.2;
+	fill-opacity: 0.4;
 }
 
 .label {

@@ -5,8 +5,8 @@ const mainView = new MainView({ parentElement: "#main" });
 const widgetPane = new WidgetPane({ parentElement: "#widgets" }, mainView);
 
 preprocessor.then(processedData => {
-	const { mainViewData, salesMax, salesMin, criticMax, criticMin, userMax, userMin} = processedData;
-	const allGames = _.flatMap(mainViewData);
+	const { mainViewData, salesMax, salesMin, criticMax, criticMin, userMax, userMin } = processedData;
+	widgetPane.data = _.flatMap(mainViewData);
 
 	mainView.sony_data = mainViewData[0];
 	mainView.microsoft_data = mainViewData[1];
@@ -20,13 +20,33 @@ preprocessor.then(processedData => {
 	mainView.userMax = userMax;
 	mainView.userMin = userMin;
 
-	widgetPane.genreList = _.uniq(_.map(allGames, "genre")).sort();
-	widgetPane.scoreList = ["Critics", "Users", "Both"];
-	widgetPane.selectedOption = widgetPane.genreList[8];
-	widgetPane.yearList = _.uniq(_.map(allGames, "year"))
+	// Initialize widget pane with default values
+	// Default game genre to show
+	widgetPane.genreList = _.uniq(_.map(widgetPane.data, "genre")).sort();
+	widgetPane.selectedGenre = widgetPane.genreList[8];
+
+	// Default release years of games
+	widgetPane.yearList = _.uniq(_.map(widgetPane.data, "year"))
 		.filter(year => !Number.isNaN(year))
 		.sort();
-	widgetPane.selectedYears = [2011, 2017];
+	widgetPane.selectedYears = [2005, 2013];
+
+	// Default game score data
+	widgetPane.scoreData = {
+		critics: {
+			name: "Critics", // for dropdown
+			default: [40, 70],
+			all: [criticMin, criticMax],
+			color: d3.interpolateBlues
+		},
+		users: {
+			name: "Users", // for dropdown
+			default: [40, 70],
+			all: [userMin, userMax],
+			color: d3.interpolatePurples
+		}
+	};
+
 	widgetPane.initVis();
 
 	mainView.widgetPane = widgetPane;

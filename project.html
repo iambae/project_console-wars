@@ -16,10 +16,16 @@
 			<div class="row">
 				<div class="col-lg-4 view-col">
 					<div id="widgets">
-						<div class="header genre">Select games by genre:</div>
-						<div class="header critics or users">Critics or Users Scores:</div>
-						<div class="header years">Select games by years released:</div>
-						<svg id="year-chart"></svg>
+						<div class="header genre">
+							<p>Select games by genre</p>
+						</div>
+						<div class="header crit-score">
+							<p>Select games by score</p>
+							<span>Critics score:&emsp;&emsp;&emsp;&emsp;&emsp;</span><span>User score:</span>
+						</div>
+						<div id="critic" class="score-chart"></div>
+						<div id="user" class="score-chart"></div>
+						<div id="dates-bars"></div>
 					</div>
 				</div>
 				<div class="col-lg-8 view-col">
@@ -33,6 +39,8 @@
 			src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.0/js/bootstrap.min.js"
 			type="text/javascript"
 		></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/crossfilter2/1.5.2/crossfilter.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/dc/3.2.1/dc.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js"></script>
 		<script src="https://d3js.org/topojson.v3.min.js"></script>
 		<script type="module" src="js/preprocessor.js"></script>

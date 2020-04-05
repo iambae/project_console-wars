@@ -1,5 +1,5 @@
-export const genreDropdown = (selection, props) => {
-	const { options, onOptionSelected, selectedOption } = props;
+export const dropdownGenreWidget = (selection, props) => {
+	const { options, onOptionSelected, selectedGenre } = props;
 
 	let select = selection
 		.selectAll("select")
@@ -17,6 +17,6 @@ export const genreDropdown = (selection, props) => {
 
 	dropdown
 		.attr("value", d => d)
-		.property("selected", d => d === selectedOption)
+		.property("selected", d => d === selectedGenre)
 		.text(d => d);
 };

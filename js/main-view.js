@@ -58,6 +58,55 @@ class MainView {
 		vis.padding = 2; // padding within cluster
 		vis.selectedGame = "";
 
+		// Tooltip Setup
+		vis.div = d3
+			.select("body")
+			.append("div")
+			.attr("class", "tooltip")
+			.attr("style", "position: fixed; opacity: 0;");
+		vis.widthCenterPercent = 41.5;
+
+		vis.circleRadius = d3
+			.scaleLinear()
+			.domain([vis.salesMin, vis.salesMax])
+			.range([5, 90]);
+
+		// Color scale
+		vis.critics_colorScale = d3
+			.scaleQuantile()
+			.domain([vis.criticMin, vis.criticMax])
+			.range(d3.schemeBlues[9]);
+
+		vis.update();
+	}
+
+	filterGame(gameArr) {
+		if (gameArr.length == 0) return gameArr;
+		return _.filter(
+			gameArr,
+			game =>
+				game.genre == this.widgetPane.selectedGenre &&
+				_.includes(_.range(this.widgetPane.selectedYears[0], this.widgetPane.selectedYears[1]), game.year) &&
+				_.includes(
+					_.range(
+						this.widgetPane.scoreData["critics"].default[0],
+						this.widgetPane.scoreData["critics"].default[1]
+					),
+					game.crit_score
+				) &&
+				_.includes(
+					_.range(
+						this.widgetPane.scoreData["users"].default[0],
+						this.widgetPane.scoreData["users"].default[1]
+					),
+					game.user_score
+				)
+		);
+	}
+
+	update() {
+		let vis = this;
+
 		vis.filteredData = {
 			sony: this.filterGame(this.sony_data),
 			microsoft: this.filterGame(this.microsoft_data),
@@ -66,41 +115,16 @@ class MainView {
 			others: this.filterGame(this.others_data)
 		};
 
-		// Tooltip Setup
-		vis.div = d3.select("body")
-			.append("div")
-			.attr("class", "tooltip")
-			.attr("style", "position: fixed; opacity: 0;");
-		vis.widthCenterPercent = 41.5;
-
-		vis.circleRadius = d3.scaleLinear()
-			.domain([vis.salesMin, vis.salesMax])
-			.range([5, 90]);
-
-		// Color scale
-		vis.critics_colorScale = d3.scaleQuantile()
-			.domain([vis.criticMin, vis.criticMax])
-			.range(d3.schemeBlues[9]);
-
+		vis.filteredDataArray = _.flatten(_.values(this.filteredData));
 
 		vis.render();
 		vis.initForce();
 	}
 
-	filterGame(gameArr) {
-		if (gameArr.length == 0) return gameArr;
-		return _.filter(
-			gameArr,
-			game =>
-				game.genre == this.widgetPane.selectedOption &&
-				_.includes(_.range(this.widgetPane.selectedYears[0], this.widgetPane.selectedYears[1]), game.year)
-		);
-	}
-
 	initForce() {
 		const allCircles = d3.selectAll("circle");
 		this.force = d3
-			.forceSimulation(_.flatten(_.values(this.filteredData)))
+			.forceSimulation(this.filteredDataArray)
 			.force(
 				"center",
 				d3.forceCenter(
@@ -110,24 +134,9 @@ class MainView {
 			)
 			.force("cluster", this.cluster().strength(0.2))
 			.force("collide", d3.forceCollide(d => this.circleRadius(d.global_sales) + this.padding).strength(0.7))
-			.on("tick", function () {
+			.on("tick", function() {
 				allCircles.attr("cx", d => d.x).attr("cy", d => d.y);
 			});
-	}
-
-	update() {
-		let vis = this;
-
-		vis.filteredData = {
-			sony: this.filterGame(vis.sony_data),
-			microsoft: this.filterGame(vis.microsoft_data),
-			nintendo: this.filterGame(vis.nintendo_data),
-			pc: this.filterGame(vis.pc_data),
-			others: this.filterGame(vis.others_data)
-		};
-
-		vis.render();
-		vis.initForce();
 	}
 
 	render() {
@@ -214,29 +223,23 @@ class MainView {
 				});
 
 				// Show Game Info in Tooltips
+				// prettier-ignore
 				d3.select(".tooltip")
 					.style("opacity", 1)
 					.style("top", "400px")
 					.style("left", "845px") // TODO: hardcoded
-					.html("<b>" +
-						d.name +
-						"</b> (" +
-						d.year +
-						")" +
-						"<br/>" +
-						d.platform +
-						"  |  " +
-						d.genre +
-						"<br/> Global Sales: " +
-						d.global_sales +
-						"M"
+					.html(
+						"<b>" +	d.name + "</b> (" + d.year + ")" +
+							"<br/>" +d.platform +
+							"  |  " + d.genre +
+							"<br/> Global Sales: " +
+							d.global_sales + "M"
 					);
 
 				vis.selectedGame = localSelected;
 			} else if (vis.selectedGame === d.console_company + d.id_num) {
 				// if selected, unselect it
-				d3.select("#" + vis.selectedGame)
-					.style("stroke-width", "0px");
+				d3.select("#" + vis.selectedGame).style("stroke-width", "0px");
 				vis.getRelatedIDs(d.name, d.console_company).forEach(d => {
 					d3.select("#" + d).style("stroke-width", "0px");
 				});
@@ -247,7 +250,6 @@ class MainView {
 			}
 		});
 	}
-
 
 	getRelatedIDs(name, company) {
 		let relatedIDs = [];
@@ -273,10 +275,9 @@ class MainView {
 
 	handleColor() {
 		let vis = this;
-		d3.selectAll('circle')
-			.attr('fill', d => {
-				return vis.critics_colorScale(d.crit_score);
-			});
+		d3.selectAll("circle").attr("fill", d => {
+			return vis.critics_colorScale(d.crit_score);
+		});
 	}
 
 	// Move d to be adjacent to the cluster node.
@@ -308,7 +309,7 @@ class MainView {
 			});
 		}
 
-		force.initialize = function (_) {
+		force.initialize = function(_) {
 			nodes = _;
 		};
 

@@ -1,95 +1,134 @@
 export const scentedYearView = (selection, props) => {
-	const { data, subRange, totalRange, onRangeChanged } = props;
+	const { data, defaultYear, totalRange, onSelectedYearChanged } = props;
 
-	console.log(totalRange);
-	console.log(subRange);
+	const width = 500;
+	const height = 300;
+	const margin = { top: 10, right: 10, bottom: 10, left: 10 };
+	const histHeight = height / 3;
 
-	const cf = crossfilter(data);
+	const years = _.range(totalRange[0], totalRange[1] + 1);
 
-	const yearDim = cf.dimension(d => d.year);
-	const yearGroup = yearDim.group();
-	const width = 700;
-	const height = 200;
-	const xScale = d3
+	// x scale for years
+	const x = d3
 		.scaleLinear()
 		.domain(totalRange)
-		.rangeRound([0, width]);
-	const binWidth = 25;
-	const binGap = 5;
-	const axisFormat = d3.axisBottom().tickFormat(d3.format("d"));
+		.range([0, width]);
 
-	const datesBarChart = dc.barChart(selection);
+	const xAxis = d3
+		.axisBottom()
+		.scale(x)
+		.tickFormat(d3.format("d"));
 
-	datesBarChart
-		.width(width)
-		.height(height)
-		.dimension(yearDim)
-		.group(yearGroup)
-		.x(xScale)
-		.xUnits(d => binWidth)
-		.gap(binGap)
-		.elasticY(true)
-		.brushOn(true)
-		.xAxis(axisFormat)
-		.filter(dc.filters.RangedFilter(subRange[0], subRange[1]));
+	// y scale for histogram
+	const y = d3.scaleLinear().range([histHeight, 0]);
 
-	datesBarChart.on("filtered", function(chart) {
-		const filters = chart.filters();
-		const range = filters[0];
-		if (filters.length) {
-			console.log("Range:", Math.round(range[0]), Math.round(range[1]));
-		} else console.log("No filters");
-	});
+	const colorScale = d3.scaleSequential(d3.interpolateGnBu).domain([0, 2000]);
 
-	// .width(400)
-	// .height(200)
-	// .transitionDuration(800)
-	// .margins({ top: 10, right: 50, bottom: 30, left: 40 })
-	// .dimension(yearDim)
-	// .group(yearGroup)
-	// .x(d3.scaleTime().domain(range))
-	// .xUnits(d3.timeYear)
-	// .centerBar(true)
-	// .renderHorizontalGridLines(true)
-	// .brushOn(true)
-	// .xAxis()
-	// .tickFormat(d3.timeFormat("%Y"));
+	// set parameters for histogram
+	const histogram = d3
+		.histogram()
+		.value(d => d.year)
+		.domain(x.domain());
 
-	//     barChart()
-	//   .dimension(date)
-	//   .group(dates)
-	//   .round(d3.timeDay.round)
-	//   .x(d3.scaleTime()
-	//     .domain([new Date(2001, 0, 1), new Date(2001, 3, 1)])
-	//     .rangeRound([0, 10 * 90]))
-	//   .filter([new Date(2001, 1, 1), new Date(2001, 2, 1)]),
+	const hist = selection
+		.append("g")
+		.attr("class", "histogram")
+		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-	// datesBarChart.on("filtered", function(chart) {
-	// 	var filters = chart.filters();
-	// 	if (filters.length) {
-	// 		var range = filters[0];
-	// 		console.log("range:", range[0], range[1]);
-	// 	} else console.log("no filters");
-	// });
+	// group data for bars
+	const bins = histogram(data);
 
-	dc.renderAll();
+	// y domain based on binned data
+	y.domain([0, d3.max(bins, d => d.length)]);
 
-	// let select = selection
-	// 	.selectAll("select")
-	// 	.data([null])
-	// 	.join("select")
-	// 	.on("change", function() {
-	// 		const selected = this.value;
-	// 		onOptionSelected(selected);
-	// 	});
+	const bar = hist
+		.selectAll(".bar")
+		.data(bins)
+		.enter()
+		.append("g")
+		.attr("class", "bar")
+		.attr("transform", d => "translate(" + x(d.x0) + "," + y(d.length) + ")");
 
-	// let dropdown = select
-	// 	.selectAll("option")
-	// 	.data(options)
-	// 	.join("option");
+	bar.append("rect")
+		.attr("class", "bar")
+		.attr("x", 1)
+		.attr("width", d => x(d.x1) - x(d.x0) - 1)
+		.attr("height", d => histHeight - y(d.length))
+		.attr("fill", d => colorScale(d.length));
 
-	// dropdown
-	// 	.attr("value", d => d)
-	// 	.property("selected", d => d === selectedOption)
-	// 	.text(d => d);
+	bar.append("text")
+		.attr("dy", ".75em")
+		.attr("y", "6")
+		.attr("x", d => (x(d.x1) - x(d.x0)) / 2)
+		.attr("text-anchor", "middle")
+		.text((d, i) => {
+			if (d.length > 30) {
+				return d.length;
+			}
+		})
+		.style("fill", "white");
+
+	hist.append("g")
+		.attr("class", "slider-labels")
+		.attr("transform", "translate(0, 120)")
+		.call(xAxis);
+
+	const dataset = data;
+
+	const slider = selection
+		.append("g")
+		.attr("class", "slider")
+		.attr("transform", "translate(" + margin.left + "," + (margin.top + histHeight + 5) + ")");
+
+	slider
+		.append("line")
+		.attr("class", "track")
+		.attr("x1", x.range()[0])
+		.attr("x2", x.range()[1])
+		.select(function() {
+			return this.parentNode.appendChild(this.cloneNode(true));
+		})
+		.attr("class", "track-inset")
+		.select(function() {
+			return this.parentNode.appendChild(this.cloneNode(true));
+		})
+		.attr("class", "track-overlay")
+		.call(
+			d3
+				.drag()
+				.on("start.interrupt", function() {
+					slider.interrupt();
+				})
+				.on("start drag", function() {
+					const selectedYear = Math.round(x.invert(d3.event.x));
+					update(selectedYear);
+				})
+		);
+
+	const handle = slider
+		.insert("ellipse", ".track-overlay")
+		.attr("class", "handle")
+		.attr("rx", 9)
+		.attr("ry", 9)
+		.attr("cx", x(defaultYear))
+		.style("fill", "rgb(250, 121, 0)");
+
+	function update(selectedYear) {
+		console.log(selectedYear);
+		handle.attr("cx", x(selectedYear));
+
+		// filter data set and redraw plot
+		const selectedYearData = _.filter(dataset, d => d.year == selectedYear);
+		onSelectedYearChanged(selectedYear);
+
+		// histogram bar colors
+		d3.selectAll(".slider-labels")
+			.selectAll(".tick")
+			.select("text")
+			.attr("stroke", d => {
+				if (d == selectedYear) {
+					return "white";
+				}
+			});
+	}
 };

@@ -1,11 +1,11 @@
-export const dropdownGenreWidget = (selection, props) => {
-	const { options, onOptionSelected, selectedGenre } = props;
+export const dropdownScoreWidget = (selection, props) => {
+	const { selectedOption, options, onOptionSelected } = props;
 
 	let select = selection
 		.selectAll("select")
 		.data([null])
 		.join("select")
-		.attr("class", "dropdown-genre")
+		.attr("class", "dropdown-score")
 		.on("change", function() {
 			const selected = this.value;
 			onOptionSelected(selected);
@@ -18,6 +18,6 @@ export const dropdownGenreWidget = (selection, props) => {
 
 	dropdown
 		.attr("value", d => d)
-		.property("selected", d => d === selectedGenre)
+		.property("selected", d => d === selectedOption)
 		.text(d => d);
 };

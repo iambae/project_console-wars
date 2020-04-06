@@ -1,6 +1,8 @@
 html,
 body {
 	width: 100%;
+	color: white;
+	background-color: #222831;
 }
 
 .header {
@@ -13,12 +15,36 @@ body {
 	text-transform: uppercase;
 }
 
-.header.crit-score {
-	margin-top: 10px;
+.header.genre {
+	position: absolute;
+	top: 5px;
 }
 
-div#dates-bars {
-	transform: translate(50, 200);
+.header.score {
+	position: absolute;
+	top: 95px;
+}
+
+.header.score-option {
+	position: absolute;
+	top: 570px;
+}
+
+.header.year {
+	position: absolute;
+	top: 680px;
+}
+
+div.widget-pane {
+	background-color: #393e46;
+}
+
+div.main-view {
+	background-color: #eeeeee;
+}
+
+div#widgets {
+	display: inline;
 }
 
 div.score-chart {
@@ -41,6 +67,20 @@ div.score-chart svg {
 	height: 300px;
 }
 
+div#date-chart {
+	transform: translate(50, 200);
+	position: absolute;
+	top: 730px;
+	left: 40px;
+	width: 700px;
+	height: 150px;
+}
+
+div#date-chart svg {
+	width: 600px;
+	height: 300px;
+}
+
 svg#main {
 	width: 150%;
 }
@@ -54,28 +94,34 @@ div.tooltip {
 	text-align: center;
 	width: auto;
 	height: auto;
-	padding: 2px;
+	padding: 5px;
 	font: 12px sans-serif;
-	background: lightsteelblue;
 	border: 2px;
-	border-radius: 8px;
+	border-radius: 5px;
 	pointer-events: none;
 }
 
-div#widgets {
-	display: inline;
-}
-
-div.container {
+div.row {
 	display: flex;
-	flex-direction: column;
+	flex-wrap: wrap;
+	flex-direction: row;
 	margin: 0px;
 }
 
-select {
+div.container-fluid {
+	padding-top: 20px;
+}
+
+select.dropdown-genre {
 	position: absolute;
 	left: 50px;
-	top: 50px;
+	top: 60px;
+}
+
+select.dropdown-score {
+	position: absolute;
+	left: 50px;
+	top: 630px;
 }
 
 .label {
@@ -102,6 +148,14 @@ rect.selection {
 	font-size: 10px;
 }
 
+.bar text {
+	font-size: 10px;
+}
+
+.ticks text {
+	font-size: 11px;
+}
+
 #labelleft,
 #labelright,
 #label-max,
@@ -120,4 +174,34 @@ rect.selection {
 
 #labelright {
 	text-anchor: start;
+}
+
+.track,
+.track-inset,
+.track-overlay {
+	stroke-linecap: round;
+}
+
+.track {
+	stroke: #dcdcdc;
+	stroke-width: 10px;
+}
+
+.track-inset {
+	stroke: #dcdcdc;
+	stroke-width: 8px;
+}
+
+.track-overlay {
+	pointer-events: stroke;
+	stroke-width: 50px;
+	stroke: transparent;
+	cursor: crosshair;
+}
+
+.track-handle {
+	fill: #fff;
+	stroke: #000;
+	stroke-opacity: 0.5;
+	stroke-width: 1.25px;
 }

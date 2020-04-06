@@ -1,4 +1,5 @@
 import { dropdownGenreWidget } from "./widgets/dropdown-genre.js";
+import { dropdownScoreWidget } from "./widgets/dropdown-score.js";
 import { scentedYearView } from "./widgets/scented-year.js";
 
 export default class WidgetPane {
@@ -16,12 +17,10 @@ export default class WidgetPane {
 		};
 
 		this.genreList = [];
-		this.selectedGenre = "";
 		this.yearList = [];
-		this.selectedYears = [];
 		this.mainView = mainView;
-		this.data = [];
 		this.scoreData = {};
+		this.data = [];
 	}
 
 	initVis() {
@@ -33,10 +32,13 @@ export default class WidgetPane {
 			.attr("height", vis.config.containerHeight);
 
 		// Add a dropdown to filter by game genre to wiget pane
-		vis.dropdownGenreWidget = vis.div.insert("div", ".header.crit-score").attr("id", "dropdown");
+		vis.dropdownGenreWidget = vis.div.insert("div", ".header.score").attr("id", "dropdown");
+
+		// Add a dropdown to select game score type to display as circle colors
+		vis.dropdownScoreWidget = vis.div.insert("div", ".header.year");
 
 		// Add to wiget pane a scented widget for selecting years of game release
-		vis.scentedYearView = vis.div.select("#dates-bars");
+		vis.scentedYearView = vis.div.select("#date-chart").append("svg");
 
 		// Add critic score filter to wiget pane
 		vis.critScoreFilterWidget = d3
@@ -70,23 +72,36 @@ export default class WidgetPane {
 	render() {
 		let vis = this;
 
+		// SELECT GAMES BY GENRE
 		vis.dropdownGenreWidget.call(dropdownGenreWidget, {
 			options: vis.genreList,
 			onOptionSelected: option => {
 				vis.selectedGenre = option;
-				vis.update();
+				vis.mainView.update();
 			},
 			selectedGenre: vis.selectedGenre || vis.genreList[0]
 		});
 
-		// vis.scentedYearView.call(scentedYearView, {
-		// 	data: vis.data,
-		// 	subRange: this.selectedYears,
-		// 	totalRange: [this.yearList[0], this.yearList[this.yearList.length - 1]],
-		// 	onRangeChanged: range => {
-		// 		console.log(range);
-		// 	}
-		// });
+		// SELECT DISPLAYED SCORE TYPE
+		vis.dropdownScoreWidget.call(dropdownScoreWidget, {
+			options: _.map(_.values(vis.scoreData), "name"),
+			onOptionSelected: option => {
+				vis.selectedOption = option;
+				vis.mainView.handleColor(option);
+			},
+			selectedOption: vis.selectedOption
+		});
+
+		// SELECT GAMES BY RELEASE YEAR
+		vis.scentedYearView.call(scentedYearView, {
+			data: vis.data,
+			defaultYear: vis.selectedYear,
+			totalRange: [vis.yearList[0], vis.yearList[vis.yearList.length - 1]],
+			onSelectedYearChanged: value => {
+				vis.selectedYear = value;
+				vis.mainView.update();
+			}
+		});
 	}
 
 	initFilterWidget(scoreType) {
@@ -151,16 +166,11 @@ export default class WidgetPane {
 			.attr("dy", ".35em")
 			.attr("transform", "rotate(-90)")
 			.style("text-anchor", "start")
-			.style("font-size", "15px");
+			.style("font-size", "14px")
+			.style("font-weight", "lighter")
+			.style("font-family", "segoe ui");
 
 		const color = d3.scaleSequential(vis.scoreData[scoreType].color).domain(range);
-
-		bar.selectAll("text")
-			.attr("y", 0)
-			.attr("x", 9)
-			.attr("dy", ".35em")
-			.attr("transform", "rotate(-90)")
-			.style("text-anchor", "start");
 
 		const gradientScale = bar
 			.append("rect")
@@ -212,7 +222,7 @@ export default class WidgetPane {
 					.transition()
 					.call(d3.event.target.move, d1.map(xScale));
 
-				vis.update();
+				vis.mainView.update();
 			});
 
 		// Append brush to g

@@ -29,19 +29,20 @@ preprocessor.then(processedData => {
 	widgetPane.yearList = _.uniq(_.map(widgetPane.data, "year"))
 		.filter(year => !Number.isNaN(year))
 		.sort();
-	widgetPane.selectedYears = [2005, 2013];
+	widgetPane.selectedYear = 2013;
 
 	// Default game score data
+	widgetPane.selectedOption = "Critics";
 	widgetPane.scoreData = {
 		critics: {
 			name: "Critics", // for dropdown
-			default: [40, 70],
+			default: [40, 90],
 			all: [criticMin, criticMax],
 			color: d3.interpolateBlues
 		},
 		users: {
 			name: "Users", // for dropdown
-			default: [40, 70],
+			default: [40, 90],
 			all: [userMin, userMax],
 			color: d3.interpolatePurples
 		}

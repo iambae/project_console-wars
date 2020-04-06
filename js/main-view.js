@@ -69,13 +69,20 @@ class MainView {
 		vis.circleRadius = d3
 			.scaleLinear()
 			.domain([vis.salesMin, vis.salesMax])
-			.range([5, 90]);
+			.range([10, 150]);
 
 		// Color scale
+		vis.critics_colorScaleRange = d3.schemeBlues[9];
 		vis.critics_colorScale = d3
 			.scaleQuantile()
 			.domain([vis.criticMin, vis.criticMax])
-			.range(d3.schemeBlues[9]);
+			.range(vis.critics_colorScaleRange);
+
+		vis.users_colorScaleRange = d3.schemePurples[9];
+		vis.users_colorScale = d3
+			.scaleQuantile()
+			.domain([vis.userMin, vis.userMax])
+			.range(vis.users_colorScaleRange);
 
 		vis.update();
 	}
@@ -86,7 +93,7 @@ class MainView {
 			gameArr,
 			game =>
 				game.genre == this.widgetPane.selectedGenre &&
-				_.includes(_.range(this.widgetPane.selectedYears[0], this.widgetPane.selectedYears[1]), game.year) &&
+				game.year == this.widgetPane.selectedYear &&
 				_.includes(
 					_.range(
 						this.widgetPane.scoreData["critics"].default[0],
@@ -203,7 +210,7 @@ class MainView {
 			.attr("cluster", "others");
 
 		vis.handleSelection();
-		vis.handleColor();
+		vis.handleColor(vis.widgetPane.selectedOption);
 	}
 
 	handleSelection() {
@@ -228,6 +235,11 @@ class MainView {
 					.style("opacity", 1)
 					.style("top", "400px")
 					.style("left", "845px") // TODO: hardcoded
+					.style("background", (d) => {
+						return vis.widgetPane.selectedOption == "Critics" ? 
+						vis.critics_colorScaleRange[8] : 
+						vis.users_colorScaleRange[8]
+					})
 					.html(
 						"<b>" +	d.name + "</b> (" + d.year + ")" +
 							"<br/>" +d.platform +
@@ -273,10 +285,17 @@ class MainView {
 		return relatedIDs;
 	}
 
-	handleColor() {
+	handleColor(selectedOption) {
 		let vis = this;
+
 		d3.selectAll("circle").attr("fill", d => {
-			return vis.critics_colorScale(d.crit_score);
+			return selectedOption == "Critics"
+				? vis.critics_colorScale(d.crit_score)
+				: vis.users_colorScale(d.user_score);
+		});
+
+		d3.select(".tooltip").style("background", d => {
+			return selectedOption == "Critics" ? vis.critics_colorScaleRange[8] : vis.users_colorScaleRange[8];
 		});
 	}
 

@@ -8,11 +8,21 @@ export const preprocessor = d3.csv("data/games.csv").then(data => {
 
 	function formatDataForMain() {
 		const games = [
-			[/*Sony*/],
-			[/*Microsoft*/],
-			[/*Nintendo*/],
-			[/*PC*/],
-			[/*Others*/]
+			[
+				/*Sony*/
+			],
+			[
+				/*Microsoft*/
+			],
+			[
+				/*Nintendo*/
+			],
+			[
+				/*PC*/
+			],
+			[
+				/*Others*/
+			]
 		];
 		for (const [i, d] of data.entries()) {
 			if (d.Critic_Score === "" || d.User_Score === "") continue;

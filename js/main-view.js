@@ -78,11 +78,13 @@ class MainView {
 			.domain([vis.criticMin, vis.criticMax])
 			.range(vis.critics_colorScaleRange);
 
-		vis.users_colorScaleRange = d3.schemePurples[9];
+		vis.users_colorScaleRange = d3.schemeReds[9];
 		vis.users_colorScale = d3
 			.scaleQuantile()
 			.domain([vis.userMin, vis.userMax])
 			.range(vis.users_colorScaleRange);
+		vis.diff_colorScale = d3.scaleSequential(d3.interpolateRdBu)
+			.domain([vis.maxScoreDiff, vis.minScoreDiff]);
 
 		vis.update();
 	}
@@ -159,6 +161,8 @@ class MainView {
 			.attr("r", d => vis.circleRadius(d.global_sales))
 			.attr("cx", d => +vis.sony_group.attr("x") + Math.random() * vis.padding)
 			.attr("cy", d => +vis.sony_group.attr("y") + Math.random() * vis.padding)
+			.attr("stroke-width", "1px")
+			.attr("stroke", "black")
 			.attr("cluster", "Sony");
 
 		vis.microsoft_circles = vis.microsoft_group
@@ -171,6 +175,8 @@ class MainView {
 			.attr("r", d => vis.circleRadius(d.global_sales))
 			.attr("cx", d => +vis.microsoft_group.attr("x") + Math.random() * vis.padding)
 			.attr("cy", d => +vis.microsoft_group.attr("y") + Math.random() * vis.padding)
+			.attr("stroke-width", "1px")
+			.attr("stroke", "black")
 			.attr("cluster", "Microsoft");
 
 		vis.nintendo_circles = vis.nintendo_group
@@ -183,6 +189,8 @@ class MainView {
 			.attr("r", d => vis.circleRadius(d.global_sales))
 			.attr("cx", d => +vis.nintendo_group.attr("x") + Math.random() * vis.padding)
 			.attr("cy", d => +vis.nintendo_group.attr("y") + Math.random() * vis.padding)
+			.attr("stroke-width", "1px")
+			.attr("stroke", "black")
 			.attr("cluster", "nintendo");
 
 		vis.pc_circles = vis.pc_group
@@ -195,6 +203,8 @@ class MainView {
 			.attr("r", d => vis.circleRadius(d.global_sales))
 			.attr("cx", d => +vis.pc_group.attr("x") + Math.random() * vis.padding)
 			.attr("cy", d => +vis.pc_group.attr("y") + Math.random() * vis.padding)
+			.attr("stroke-width", "1px")
+			.attr("stroke", "black")
 			.attr("cluster", "pc");
 
 		vis.others_circles = vis.others_group
@@ -207,6 +217,8 @@ class MainView {
 			.attr("r", d => vis.circleRadius(d.global_sales))
 			.attr("cx", d => +vis.others_group.attr("x") + Math.random() * vis.padding)
 			.attr("cy", d => +vis.others_group.attr("y") + Math.random() * vis.padding)
+			.attr("stroke-width", "1px")
+			.attr("stroke", "black")
 			.attr("cluster", "others");
 
 		vis.handleSelection();
@@ -234,7 +246,7 @@ class MainView {
 				d3.select(".tooltip")
 					.style("opacity", 1)
 					.style("top", "400px")
-					.style("left", "845px") // TODO: hardcoded
+					.style("left", "1150px") // TODO: hardcoded
 					.style("background", (d) => {
 						return vis.widgetPane.selectedOption == "Critics" ? 
 						vis.critics_colorScaleRange[8] : 
@@ -251,9 +263,9 @@ class MainView {
 				vis.selectedGame = localSelected;
 			} else if (vis.selectedGame === d.console_company + d.id_num) {
 				// if selected, unselect it
-				d3.select("#" + vis.selectedGame).style("stroke-width", "0px");
+				d3.select("#" + vis.selectedGame).style("stroke", "black").style("stroke-width", "1px");
 				vis.getRelatedIDs(d.name, d.console_company).forEach(d => {
-					d3.select("#" + d).style("stroke-width", "0px");
+					d3.select("#" + d).style("stroke", "black").style("stroke-width", "1px");
 				});
 
 				d3.select(".tooltip").style("opacity", 0); // Hide tooltips
@@ -291,7 +303,9 @@ class MainView {
 		d3.selectAll("circle").attr("fill", d => {
 			return selectedOption == "Critics"
 				? vis.critics_colorScale(d.crit_score)
-				: vis.users_colorScale(d.user_score);
+				: selectedOption == "Users"
+				? vis.users_colorScale(d.user_score)
+				: vis.diff_colorScale(d.score_diff)
 		});
 
 		d3.select(".tooltip").style("background", d => {

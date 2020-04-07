@@ -47,12 +47,19 @@ export default class WidgetPane {
 			.append("g")
 			.attr("transform", "translate(50, 100)");
 
-		// Add year slider to wiget pane
+		// Add user score slider to wiget pane
 		vis.userScoreFilterWidget = d3
 			.select("#user")
 			.append("svg")
 			.append("g")
 			.attr("transform", "translate(100, 100)");
+
+		// Add diff score slider to wiget pane
+		vis.scoreDiffFilterWidget = d3
+			.select("#diff")
+			.append("svg")
+			.append("g")
+			.attr("transform", "translate(150, 100)");
 
 		// Add filter view for each game score type
 		_.map(_.keys(vis.scoreData), type => {
@@ -132,7 +139,9 @@ export default class WidgetPane {
 
 		scoreType == "critics"
 			? vis.critScoreFilterWidget.join("g").attr("class", "container")
-			: vis.userScoreFilterWidget.join("g").attr("class", "container");
+			: scoreType == "users"
+				? vis.userScoreFilterWidget.join("g").attr("class", "container")
+				: vis.scoreDiffFilterWidget.join("g").attr("class", "container");
 
 		const roundScale = d => Math.round(xScale(d) / 5) * 5;
 		// create x scale
@@ -146,13 +155,21 @@ export default class WidgetPane {
 		let bar =
 			scoreType == "critics"
 				? vis.critScoreFilterWidget
+					.selectAll("g")
+					.data(scoreRange)
+					.enter()
+					.append("g")
+					.call(xAxis)
+					.attr("x", d => roundScale(d))
+				: scoreType == "users"
+					? vis.userScoreFilterWidget
 						.selectAll("g")
 						.data(scoreRange)
 						.enter()
 						.append("g")
 						.call(xAxis)
 						.attr("x", d => roundScale(d))
-				: vis.userScoreFilterWidget
+					: vis.scoreDiffFilterWidget
 						.selectAll("g")
 						.data(scoreRange)
 						.enter()
@@ -189,7 +206,7 @@ export default class WidgetPane {
 				[0, 0],
 				[width, height]
 			])
-			.on("brush", function() {
+			.on("brush", function () {
 				let s = d3.event.selection;
 
 				// Update and move labels
@@ -209,12 +226,15 @@ export default class WidgetPane {
 				if (scoreType == "critics") {
 					vis.critScoreFilterWidget.node().value = s.map(d => bucketSize * Math.round(xScale.invert(d)));
 					vis.critScoreFilterWidget.node().dispatchEvent(new CustomEvent("input"));
-				} else {
+				} else if (scoreType == "users") {
 					vis.userScoreFilterWidget.node().value = s.map(d => bucketSize * Math.round(xScale.invert(d)));
 					vis.userScoreFilterWidget.node().dispatchEvent(new CustomEvent("input"));
+				} else {
+					vis.scoreDiffFilterWidget.node().value = s.map(d => bucketSize * Math.round(xScale.invert(d)));
+					vis.scoreDiffFilterWidget.node().dispatchEvent(new CustomEvent("input"));
 				}
 			})
-			.on("end", function() {
+			.on("end", function () {
 				if (!d3.event.sourceEvent) return;
 				let d0 = d3.event.selection.map(xScale.invert);
 				let d1 = d0.map(Math.round);
@@ -229,27 +249,32 @@ export default class WidgetPane {
 		let gBrush =
 			scoreType == "critics"
 				? vis.critScoreFilterWidget
+					.append("g")
+					.attr("class", "brush")
+					.call(brush)
+				: scoreType == "users"
+					? vis.userScoreFilterWidget
 						.append("g")
 						.attr("class", "brush")
 						.call(brush)
-				: vis.userScoreFilterWidget
+					: vis.scoreDiffFilterWidget
 						.append("g")
 						.attr("class", "brush")
-						.call(brush);
+						.call(brush)
 
 		// Add brush handles (from https://bl.ocks.org/Fil/2d43867ba1f36a05459c7113c7f6f98a)
-		let brushResizePath = function(d) {
+		let brushResizePath = function (d) {
 			let e = +(d.type == "e"),
 				x = e ? 1 : -1,
 				y = height / 2;
 
 			// prettier-ignore
 			return (
-					"M" + 0.5 * x + "," + y + "A6,6 0 0 " + e + " " + 6.5 * x +	"," + 
-					(y + 6) + "V" +	(2 * y - 6) + "A6,6 0 0 " +	e +	" " + 0.5 * x +	"," +
-					 2 * y + "Z" +	"M" + 2.5 * x +	"," + (y + 8) +	"V" +
-					(2 * y - 8) + "M" +	4.5 * x +	"," + (y + 8) + "V" + (2 * y - 8)
-				);
+				"M" + 0.5 * x + "," + y + "A6,6 0 0 " + e + " " + 6.5 * x + "," +
+				(y + 6) + "V" + (2 * y - 6) + "A6,6 0 0 " + e + " " + 0.5 * x + "," +
+				2 * y + "Z" + "M" + 2.5 * x + "," + (y + 8) + "V" +
+				(2 * y - 8) + "M" + 4.5 * x + "," + (y + 8) + "V" + (2 * y - 8)
+			);
 		};
 
 		let handle = gBrush
@@ -268,7 +293,7 @@ export default class WidgetPane {
 		// (from https://bl.ocks.org/mbostock/6498000)
 		gBrush
 			.selectAll(".overlay")
-			.each(function(d) {
+			.each(function (d) {
 				d.type = "selection";
 			})
 			.on("mousedown touchstart", brushcentered)
@@ -285,6 +310,6 @@ export default class WidgetPane {
 		// Select default range
 		gBrush.call(brush.move, [vis.scoreData[scoreType].default[0], vis.scoreData[scoreType].default[1]].map(xScale));
 
-		return scoreType == "critics" ? vis.critScoreFilterWidget.node() : vis.userScoreFilterWidget.node();
+		return scoreType == "critics" ? vis.critScoreFilterWidget.node() :  scoreType == "users" ? vis.userScoreFilterWidget.node() : vis.scoreDiffFilterWidget.node();
 	}
 }

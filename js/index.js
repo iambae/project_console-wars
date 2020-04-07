@@ -5,7 +5,7 @@ const mainView = new MainView({ parentElement: "#main" });
 const widgetPane = new WidgetPane({ parentElement: "#widgets" }, mainView);
 
 preprocessor.then(processedData => {
-	const { mainViewData, salesMax, salesMin, criticMax, criticMin, userMax, userMin } = processedData;
+	const { mainViewData, salesMax, salesMin, criticMax, criticMin, userMax, userMin, maxScoreDiff, minScoreDiff} = processedData;
 	widgetPane.data = _.flatMap(mainViewData);
 
 	mainView.sony_data = mainViewData[0];
@@ -19,6 +19,8 @@ preprocessor.then(processedData => {
 	mainView.criticMin = criticMin;
 	mainView.userMax = userMax;
 	mainView.userMin = userMin;
+	mainView.maxScoreDiff = maxScoreDiff;
+	mainView.minScoreDiff = minScoreDiff;
 
 	// Initialize widget pane with default values
 	// Default game genre to show
@@ -44,7 +46,13 @@ preprocessor.then(processedData => {
 			name: "Users", // for dropdown
 			default: [40, 90],
 			all: [userMin, userMax],
-			color: d3.interpolatePurples
+			color: d3.interpolateReds
+		},
+		diff: {
+			name: "Differences", // for dropdown
+			default: [40, 90],
+			all: [maxScoreDiff, minScoreDiff],
+			color: d3.interpolateRdBu
 		}
 	};
 

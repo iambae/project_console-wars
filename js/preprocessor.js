@@ -1,6 +1,10 @@
 export const preprocessor = d3.csv("data/games.csv").then(data => {
 	let salesMax = 0,
-		salesMin = Infinity;
+		salesMin = Infinity,
+		criticMax = 0,
+		criticMin = Infinity,
+		userMax = 0,
+		userMin = Infinity;
 
 	function formatDataForMain() {
 		const games = [
@@ -25,6 +29,10 @@ export const preprocessor = d3.csv("data/games.csv").then(data => {
 			// update max min
 			if (salesMax < +d.Global_Sales) salesMax = +d.Global_Sales;
 			if (salesMin > +d.Global_Sales) salesMin = +d.Global_Sales;
+			if (criticMax < +d.Critic_Score) criticMax = +d.Critic_Score;
+			if (criticMin > +d.Critic_Score) criticMin = +d.Critic_Score;
+			if (userMax < +d.User_Score * 10) userMax = +d.User_Score * 10;
+			if (userMin > +d.User_Score * 10) userMin = +d.User_Score * 10;
 
 			const game = {};
 			game.name = d.Name;
@@ -48,9 +56,7 @@ export const preprocessor = d3.csv("data/games.csv").then(data => {
 			} else if (d.Platform.match(/^(XB|X360|XOne)$/)) {
 				game.console_company = "microsoft";
 				games[1].push(game);
-			} else if (
-				d.Platform.match(/^(3DS|DS|GB|GBA|GC|N64|NES|SNES|Wii|WiiU)$/)
-			) {
+			} else if (d.Platform.match(/^(3DS|DS|GB|GBA|GC|N64|NES|SNES|Wii|WiiU)$/)) {
 				game.console_company = "nintendo";
 				games[2].push(game);
 			} else if (d.Platform == "PC") {
@@ -65,7 +71,6 @@ export const preprocessor = d3.csv("data/games.csv").then(data => {
 	}
 
 	const mainViewData = formatDataForMain();
-	console.log(mainViewData)
 
-	return { mainViewData, salesMax, salesMin };
+	return { mainViewData, salesMax, salesMin, criticMax, criticMin, userMax, userMin };
 });

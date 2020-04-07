@@ -1,6 +1,8 @@
 html,
 body {
 	width: 100%;
+	color: white;
+	background-color: #222831;
 }
 
 .header {
@@ -8,25 +10,79 @@ body {
 	margin-left: 30px;
 }
 
-.header.years {
-	margin-top: 50px;
+.header > p {
+	font-weight: bold;
+	text-transform: uppercase;
 }
 
-svg#year-chart {
+.header.genre {
+	position: absolute;
+	top: 5px;
+}
+
+.header.score {
+	position: absolute;
+	top: 95px;
+}
+
+.header.score-option {
+	position: absolute;
+	top: 570px;
+}
+
+.header.year {
+	position: absolute;
+	top: 680px;
+}
+
+div.widget-pane {
+	background-color: #393e46;
+}
+
+div.main-view {
+	background-color: #eeeeee;
+}
+
+div#widgets {
+	display: inline;
+}
+
+div.score-chart {
 	-ms-transform: rotate(90deg);
 	transform: rotate(90deg);
+	width: 400px;
+	height: 300px;
+	position: absolute;
+	top: 180px;
+	left: -90px;
+}
+
+div#user.score-chart {
+	top: 130px;
+	left: 80px;
+}
+
+div.score-chart svg {
+	width: 500px;
+	height: 300px;
+}
+
+div#date-chart {
+	transform: translate(50, 200);
+	position: absolute;
+	top: 730px;
+	left: 40px;
+	width: 700px;
+	height: 150px;
+}
+
+div#date-chart svg {
 	width: 600px;
-	height: 500px;
+	height: 300px;
 }
 
 svg#main {
 	width: 150%;
-}
-
-circle {
-	stroke: #ccc;
-	fill: #fff;
-	stroke-width: 3px;
 }
 
 div.view-col {
@@ -38,28 +94,34 @@ div.tooltip {
 	text-align: center;
 	width: auto;
 	height: auto;
-	padding: 2px;
+	padding: 5px;
 	font: 12px sans-serif;
-	background: lightsteelblue;
-	border: 0px;
-	border-radius: 8px;
+	border: 2px;
+	border-radius: 5px;
 	pointer-events: none;
 }
 
-div#widgets {
-	display: inline;
-}
-
-div.container {
+div.row {
 	display: flex;
-	flex-direction: column;
+	flex-wrap: wrap;
+	flex-direction: row;
 	margin: 0px;
 }
 
-select {
+div.container-fluid {
+	padding-top: 20px;
+}
+
+select.dropdown-genre {
 	position: absolute;
 	left: 50px;
-	top: 50px;
+	top: 60px;
+}
+
+select.dropdown-score {
+	position: absolute;
+	left: 50px;
+	top: 630px;
 }
 
 .label {
@@ -77,13 +139,21 @@ rect.overlay {
 }
 
 rect.selection {
-	stroke: none;
+	stroke: white;
 	fill: white;
-	fill-opacity: 0.2;
+	fill-opacity: 0.4;
 }
 
 .label {
 	font-size: 10px;
+}
+
+.bar text {
+	font-size: 10px;
+}
+
+.ticks text {
+	font-size: 11px;
 }
 
 #labelleft,
@@ -104,4 +174,34 @@ rect.selection {
 
 #labelright {
 	text-anchor: start;
+}
+
+.track,
+.track-inset,
+.track-overlay {
+	stroke-linecap: round;
+}
+
+.track {
+	stroke: #dcdcdc;
+	stroke-width: 10px;
+}
+
+.track-inset {
+	stroke: #dcdcdc;
+	stroke-width: 8px;
+}
+
+.track-overlay {
+	pointer-events: stroke;
+	stroke-width: 50px;
+	stroke: transparent;
+	cursor: crosshair;
+}
+
+.track-handle {
+	fill: #fff;
+	stroke: #000;
+	stroke-opacity: 0.5;
+	stroke-width: 1.25px;
 }

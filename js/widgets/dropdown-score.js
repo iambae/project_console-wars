@@ -1,10 +1,11 @@
-export const genreDropdown = (selection, props) => {
-	const { options, onOptionSelected, selectedOption } = props;
+export const dropdownScoreWidget = (selection, props) => {
+	const { selectedOption, options, onOptionSelected } = props;
 
 	let select = selection
 		.selectAll("select")
 		.data([null])
 		.join("select")
+		.attr("class", "dropdown-score")
 		.on("change", function() {
 			const selected = this.value;
 			onOptionSelected(selected);

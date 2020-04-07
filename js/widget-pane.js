@@ -54,13 +54,6 @@ export default class WidgetPane {
 			.append("g")
 			.attr("transform", "translate(100, 100)");
 
-		// Add diff score slider to wiget pane
-		vis.scoreDiffFilterWidget = d3
-			.select("#diff")
-			.append("svg")
-			.append("g")
-			.attr("transform", "translate(150, 100)");
-
 		// Add filter view for each game score type
 		_.map(_.keys(vis.scoreData), type => {
 			vis.initFilterWidget(type);
@@ -113,6 +106,7 @@ export default class WidgetPane {
 
 	initFilterWidget(scoreType) {
 		let vis = this;
+		if (scoreType != "critics" && scoreType != "users") return;
 
 		const defaultOptions = {
 			w: 400,
@@ -139,9 +133,7 @@ export default class WidgetPane {
 
 		scoreType == "critics"
 			? vis.critScoreFilterWidget.join("g").attr("class", "container")
-			: scoreType == "users"
-				? vis.userScoreFilterWidget.join("g").attr("class", "container")
-				: vis.scoreDiffFilterWidget.join("g").attr("class", "container");
+			: vis.userScoreFilterWidget.join("g").attr("class", "container");
 
 		const roundScale = d => Math.round(xScale(d) / 5) * 5;
 		// create x scale
@@ -161,21 +153,13 @@ export default class WidgetPane {
 					.append("g")
 					.call(xAxis)
 					.attr("x", d => roundScale(d))
-				: scoreType == "users"
-					? vis.userScoreFilterWidget
-						.selectAll("g")
-						.data(scoreRange)
-						.enter()
-						.append("g")
-						.call(xAxis)
-						.attr("x", d => roundScale(d))
-					: vis.scoreDiffFilterWidget
-						.selectAll("g")
-						.data(scoreRange)
-						.enter()
-						.append("g")
-						.call(xAxis)
-						.attr("x", d => roundScale(d));
+				: vis.userScoreFilterWidget
+					.selectAll("g")
+					.data(scoreRange)
+					.enter()
+					.append("g")
+					.call(xAxis)
+					.attr("x", d => roundScale(d));
 
 		bar.selectAll("text")
 			.attr("y", 0)
@@ -226,12 +210,9 @@ export default class WidgetPane {
 				if (scoreType == "critics") {
 					vis.critScoreFilterWidget.node().value = s.map(d => bucketSize * Math.round(xScale.invert(d)));
 					vis.critScoreFilterWidget.node().dispatchEvent(new CustomEvent("input"));
-				} else if (scoreType == "users") {
+				} else {
 					vis.userScoreFilterWidget.node().value = s.map(d => bucketSize * Math.round(xScale.invert(d)));
 					vis.userScoreFilterWidget.node().dispatchEvent(new CustomEvent("input"));
-				} else {
-					vis.scoreDiffFilterWidget.node().value = s.map(d => bucketSize * Math.round(xScale.invert(d)));
-					vis.scoreDiffFilterWidget.node().dispatchEvent(new CustomEvent("input"));
 				}
 			})
 			.on("end", function () {
@@ -252,15 +233,10 @@ export default class WidgetPane {
 					.append("g")
 					.attr("class", "brush")
 					.call(brush)
-				: scoreType == "users"
-					? vis.userScoreFilterWidget
-						.append("g")
-						.attr("class", "brush")
-						.call(brush)
-					: vis.scoreDiffFilterWidget
-						.append("g")
-						.attr("class", "brush")
-						.call(brush)
+				: vis.userScoreFilterWidget
+					.append("g")
+					.attr("class", "brush")
+					.call(brush);
 
 		// Add brush handles (from https://bl.ocks.org/Fil/2d43867ba1f36a05459c7113c7f6f98a)
 		let brushResizePath = function (d) {
@@ -310,6 +286,6 @@ export default class WidgetPane {
 		// Select default range
 		gBrush.call(brush.move, [vis.scoreData[scoreType].default[0], vis.scoreData[scoreType].default[1]].map(xScale));
 
-		return scoreType == "critics" ? vis.critScoreFilterWidget.node() :  scoreType == "users" ? vis.userScoreFilterWidget.node() : vis.scoreDiffFilterWidget.node();
+		return scoreType == "critics" ? vis.critScoreFilterWidget.node() : vis.userScoreFilterWidget.node();
 	}
 }

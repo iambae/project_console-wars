@@ -143,7 +143,7 @@ class MainView {
 			)
 			.force("cluster", this.cluster().strength(0.2))
 			.force("collide", d3.forceCollide(d => this.circleRadius(d.global_sales) + this.padding).strength(0.7))
-			.on("tick", function() {
+			.on("tick", function () {
 				allCircles.attr("cx", d => d.x).attr("cy", d => d.y);
 			});
 	}
@@ -227,51 +227,48 @@ class MainView {
 
 	handleSelection() {
 		let vis = this;
-		vis.svg.selectAll("circle").on("click", d => {
-			if (vis.selectedGame === "") {
-				// if not selected, select it
-				const localSelected = d.console_company + d.id_num;
+		vis.svg.selectAll("circle").on("mouseover", d => {
+			// if not selected, select it
+			const localSelected = d.console_company + d.id_num;
 
-				d3.select("#" + localSelected)
-					.style("stroke", "#FF4F00")
+			d3.select("#" + localSelected)
+				.style("stroke", "#FF4F00")
+				.style("stroke-width", "3px");
+			vis.getRelatedIDs(d.name, d.console_company).forEach(d => {
+				d3.select("#" + d)
+					.style("stroke", "#FF7538")
 					.style("stroke-width", "3px");
-				vis.getRelatedIDs(d.name, d.console_company).forEach(d => {
-					d3.select("#" + d)
-						.style("stroke", "#FF7538")
-						.style("stroke-width", "3px");
-				});
+			});
 
-				// Show Game Info in Tooltips
-				// prettier-ignore
-				d3.select(".tooltip")
-					.style("opacity", 1)
-					.style("background", (d) => {
-						return vis.widgetPane.selectedOption == "Critics" ? 
-						vis.critics_colorScaleRange[8] : 
+			// Show Game Info in Tooltips
+			// prettier-ignore
+			d3.select(".tooltip")
+				.style("opacity", 1)
+				.style("background", (d) => {
+					return vis.widgetPane.selectedOption == "Critics" ?
+						vis.critics_colorScaleRange[8] :
 						vis.users_colorScaleRange[8]
-					})
-					.html(
-						"<b>" +	d.name + "</b> (" + d.year + ")" +
-							"<br/>" +d.platform +
-							"  |  " + d.genre +
-							"<br/> Global Sales: " +
-							d.global_sales + "M"
-					)
-					.style("top", "400px")
-					.style("left", 1220 - +d3.select(".tooltip").style("width").replace("px", "") / 2 + "px");
+				})
+				.html(
+					"<b>" + d.name + "</b> (" + d.year + ")" +
+					"<br/>" + d.platform + "  |  " + d.genre +
+					"<br/> Global Sales: " +
+					d.global_sales + "M"
+				)
+				.style("top", "400px")
+				.style("left", 1220 - +d3.select(".tooltip").style("width").replace("px", "") / 2 + "px");
 
-				vis.selectedGame = localSelected;
-			} else if (vis.selectedGame === d.console_company + d.id_num) {
-				// if selected, unselect it
-				d3.select("#" + vis.selectedGame).style("stroke", "black").style("stroke-width", "1px");
-				vis.getRelatedIDs(d.name, d.console_company).forEach(d => {
-					d3.select("#" + d).style("stroke", "black").style("stroke-width", "1px");
-				});
+			vis.selectedGame = localSelected;
+		}).on("mouseout", d => {
+			// if selected, unselect it
+			d3.select("#" + vis.selectedGame).style("stroke", "black").style("stroke-width", "1px");
+			vis.getRelatedIDs(d.name, d.console_company).forEach(d => {
+				d3.select("#" + d).style("stroke", "black").style("stroke-width", "1px");
+			});
 
-				d3.select(".tooltip").style("opacity", 0); // Hide tooltips
+			d3.select(".tooltip").style("opacity", 0); // Hide tooltips
 
-				vis.selectedGame = "";
-			}
+			vis.selectedGame = "";
 		});
 	}
 
@@ -304,8 +301,8 @@ class MainView {
 			return selectedOption == "Critics"
 				? vis.critics_colorScale(d.crit_score)
 				: selectedOption == "Users"
-				? vis.users_colorScale(d.user_score)
-				: vis.diff_colorScale(d.score_diff)
+					? vis.users_colorScale(d.user_score)
+					: vis.diff_colorScale(d.score_diff)
 		});
 
 		d3.select(".tooltip").style("background", d => {
@@ -342,7 +339,7 @@ class MainView {
 			});
 		}
 
-		force.initialize = function(_) {
+		force.initialize = function (_) {
 			nodes = _;
 		};
 

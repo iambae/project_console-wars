@@ -245,8 +245,6 @@ class MainView {
 				// prettier-ignore
 				d3.select(".tooltip")
 					.style("opacity", 1)
-					.style("top", "400px")
-					.style("left", "1150px") // TODO: hardcoded
 					.style("background", (d) => {
 						return vis.widgetPane.selectedOption == "Critics" ? 
 						vis.critics_colorScaleRange[8] : 
@@ -258,7 +256,9 @@ class MainView {
 							"  |  " + d.genre +
 							"<br/> Global Sales: " +
 							d.global_sales + "M"
-					);
+					)
+					.style("top", "400px")
+					.style("left", 1220 - +d3.select(".tooltip").style("width").replace("px", "") / 2 + "px");
 
 				vis.selectedGame = localSelected;
 			} else if (vis.selectedGame === d.console_company + d.id_num) {

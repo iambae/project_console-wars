@@ -86,6 +86,7 @@ class MainView {
 		vis.diff_colorScale = d3.scaleSequential(d3.interpolateRdBu)
 			.domain([vis.maxScoreDiff, vis.minScoreDiff]);
 
+		vis.initSequentialLegend();
 		vis.update();
 	}
 
@@ -161,8 +162,6 @@ class MainView {
 			.attr("r", d => vis.circleRadius(d.global_sales))
 			.attr("cx", d => +vis.sony_group.attr("x") + Math.random() * vis.padding)
 			.attr("cy", d => +vis.sony_group.attr("y") + Math.random() * vis.padding)
-			.attr("stroke-width", "1px")
-			.attr("stroke", "black")
 			.attr("cluster", "Sony");
 
 		vis.microsoft_circles = vis.microsoft_group
@@ -175,8 +174,6 @@ class MainView {
 			.attr("r", d => vis.circleRadius(d.global_sales))
 			.attr("cx", d => +vis.microsoft_group.attr("x") + Math.random() * vis.padding)
 			.attr("cy", d => +vis.microsoft_group.attr("y") + Math.random() * vis.padding)
-			.attr("stroke-width", "1px")
-			.attr("stroke", "black")
 			.attr("cluster", "Microsoft");
 
 		vis.nintendo_circles = vis.nintendo_group
@@ -189,8 +186,6 @@ class MainView {
 			.attr("r", d => vis.circleRadius(d.global_sales))
 			.attr("cx", d => +vis.nintendo_group.attr("x") + Math.random() * vis.padding)
 			.attr("cy", d => +vis.nintendo_group.attr("y") + Math.random() * vis.padding)
-			.attr("stroke-width", "1px")
-			.attr("stroke", "black")
 			.attr("cluster", "nintendo");
 
 		vis.pc_circles = vis.pc_group
@@ -203,8 +198,6 @@ class MainView {
 			.attr("r", d => vis.circleRadius(d.global_sales))
 			.attr("cx", d => +vis.pc_group.attr("x") + Math.random() * vis.padding)
 			.attr("cy", d => +vis.pc_group.attr("y") + Math.random() * vis.padding)
-			.attr("stroke-width", "1px")
-			.attr("stroke", "black")
 			.attr("cluster", "pc");
 
 		vis.others_circles = vis.others_group
@@ -217,8 +210,6 @@ class MainView {
 			.attr("r", d => vis.circleRadius(d.global_sales))
 			.attr("cx", d => +vis.others_group.attr("x") + Math.random() * vis.padding)
 			.attr("cy", d => +vis.others_group.attr("y") + Math.random() * vis.padding)
-			.attr("stroke-width", "1px")
-			.attr("stroke", "black")
 			.attr("cluster", "others");
 
 		vis.handleSelection();
@@ -297,18 +288,75 @@ class MainView {
 	handleColor(selectedOption) {
 		let vis = this;
 
-		d3.selectAll("circle").attr("fill", d => {
-			return selectedOption == "Critics"
-				? vis.critics_colorScale(d.crit_score)
-				: selectedOption == "Users"
-					? vis.users_colorScale(d.user_score)
-					: vis.diff_colorScale(d.score_diff)
-		});
+		d3.selectAll("circle")
+			.attr("stroke-width", "1px")
+			.attr("stroke", "black")
+			.attr("fill", d => {
+				return selectedOption == "Critics"
+					? vis.critics_colorScale(d.crit_score)
+					: selectedOption == "Users"
+						? vis.users_colorScale(d.user_score)
+						: vis.diff_colorScale(d.score_diff)
+			});
 
 		d3.select(".tooltip").style("background", d => {
 			return selectedOption == "Critics" ? vis.critics_colorScaleRange[8] : vis.users_colorScaleRange[8];
 		});
+
+		if (selectedOption == "Differences") d3.select("#legend").style("opacity", 1);
+		else d3.select("#legend").style("opacity", 0);
 	}
+
+	// from http://bl.ocks.org/syntagmatic/e8ccca52559796be775553b467593a9f
+	initSequentialLegend() {
+		const vis = this,
+			legendheight = 200,
+			legendwidth = 80,
+			margin = { top: 10, right: 60, bottom: 10, left: 5 };
+
+		var canvas = d3.select("#legend")
+			.style("height", legendheight + "px")
+			.style("width", legendwidth + "px")
+			.style("position", "absolute")
+			.style("top", (margin.top) + "px")
+			.style("left", (margin.left) + "px")
+			.append("canvas")
+			.attr("height", legendheight - margin.top - margin.bottom)
+			.attr("width", 1)
+			.style("height", (legendheight - margin.top - margin.bottom) + "px")
+			.style("width", (legendwidth - margin.left - margin.right) + "px")
+			.style("border", "1px solid #000")
+			.node();
+
+		var legendscale = d3.scaleLinear()
+			.range([1, legendheight - margin.top - margin.bottom])
+			.domain(vis.diff_colorScale.domain());
+
+		const ctx = canvas.getContext("2d");
+		d3.range(legendheight).forEach(function (i) {
+			ctx.fillStyle = vis.diff_colorScale(legendscale.invert(i));
+			ctx.fillRect(0, i, 1, 1);
+		});
+
+		const legendaxis = d3.axisRight()
+			.scale(legendscale)
+			.tickSize(6)
+			.ticks(8)
+			.tickFormat(d => d == 60 ? d + " (User Score - Critics Score)" : d);
+
+		d3.select("#legend")
+			.append("svg")
+			.attr("height", (legendheight) + 30 + "px")
+			.attr("width", (legendwidth) + 150 + "px")
+			.style("position", "absolute")
+			.style("top", "-10px")
+			.append("g")
+			.attr("class", "axis")
+			.attr("transform", "translate(" + (legendwidth - margin.left - margin.right - 15) + "," + (margin.top - 1) + ")")
+			.style("color", "black")
+			.style("font-size", "15px")
+			.call(legendaxis);
+	};
 
 	// Move d to be adjacent to the cluster node.
 	// from: https://bl.ocks.org/ericsoco/cd0c38a20141e997e926592264067db3

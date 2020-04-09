@@ -11,6 +11,7 @@ export const scentedYearView = (selection, props) => {
 	// x scale for years of release
 	const x = d3.scaleLinear().domain(totalRange).range([0, width]);
 	const xAxis = d3.axisBottom().scale(x).tickFormat(d3.format("d"));
+	const getYear = (val) => Math.round(x.invert(val));
 	// y scale for count of games
 	const y = d3.scaleLinear().range([histHeight, 0]);
 	// color scale to encode number of games in each year bin
@@ -108,13 +109,15 @@ export const scentedYearView = (selection, props) => {
 				slider.interrupt();
 			})
 			.on("drag end", function () {
+				const xloc = d3.event.x;
 				if (d3.event.active == 1) dx = d3.event.dx;
+				if (getYear(xloc) < totalRange[0] || getYear(xloc) > totalRange[1]) return;
 
 				// optimized to only pick up on end event
 				if (d3.event.type == "end") {
 					const currentLeftX = d3.select(".handle.left").attr("cx"); // x position of left handle
 					const currentRightX = d3.select(".handle.right").attr("cx"); // x position of right handle
-					const xloc = d3.event.x; // x position of end event of drag
+					// x position of end event of drag
 
 					// define conditions of brush movement
 					const rightMovedRight = xloc > currentLeftX + dx && xloc > currentRightX && dx > 0;
@@ -132,13 +135,13 @@ export const scentedYearView = (selection, props) => {
 	);
 
 	function updateStartRange(newLeftX, oldRightX) {
-		const updatedStartYear = Math.round(x.invert(newLeftX));
+		const updatedStartYear = getYear(newLeftX);
 		// move left handle to new position
 		startHandle.transition().delay(250).attr("cx", x(updatedStartYear));
 		// right handle position stays unchanged
-		const endYear = Math.round(x.invert(oldRightX));
+		const endYear = getYear(oldRightX);
 		const newRange = [updatedStartYear, endYear];
-
+		console.log(newRange);
 		// callback to update range
 		onSelectedYearRangeChanged(newRange);
 
@@ -154,13 +157,13 @@ export const scentedYearView = (selection, props) => {
 	}
 
 	function updateEndRange(newRightX, oldLeftX) {
-		const updatedEndYear = Math.round(x.invert(newRightX));
+		const updatedEndYear = getYear(newRightX);
 		// move right handle to new position
 		endHandle.transition().delay(250).attr("cx", x(updatedEndYear));
 		// left handle position stays unchanged
-		const startYear = Math.round(x.invert(oldLeftX));
+		const startYear = getYear(oldLeftX);
 		const newRange = [startYear, updatedEndYear];
-
+		console.log(newRange);
 		// callback to update range
 		onSelectedYearRangeChanged(newRange);
 

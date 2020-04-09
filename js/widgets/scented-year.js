@@ -1,3 +1,5 @@
+/* Design inspired by https://bl.ocks.org/officeofjane/f132634f67b114815ba686484f9f7a77 */
+
 export const scentedYearView = (selection, props) => {
 	const { data, defaultYearRange, totalRange, onSelectedYearRangeChanged } = props;
 
@@ -6,14 +8,13 @@ export const scentedYearView = (selection, props) => {
 	const margin = { top: 10, right: 10, bottom: 10, left: 10 };
 	const histHeight = height / 3;
 
-	// x scale for years
+	// x scale for years of release
 	const x = d3.scaleLinear().domain(totalRange).range([0, width]);
-
 	const xAxis = d3.axisBottom().scale(x).tickFormat(d3.format("d"));
-
-	// y scale for histogram
+	const getYear = (val) => Math.round(x.invert(val));
+	// y scale for count of games
 	const y = d3.scaleLinear().range([histHeight, 0]);
-
+	// color scale to encode number of games in each year bin
 	const colorScale = d3.scaleSequential(d3.interpolateGreys).domain([0, 2000]);
 
 	// set parameters for histogram
@@ -27,10 +28,7 @@ export const scentedYearView = (selection, props) => {
 		.attr("class", "histogram")
 		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-	// group data for bars
 	const bins = histogram(data);
-
-	// y domain based on binned data
 	y.domain([0, d3.max(bins, (d) => d.length)]);
 
 	const bar = hist
@@ -48,6 +46,7 @@ export const scentedYearView = (selection, props) => {
 		.attr("height", (d) => histHeight - y(d.length))
 		.attr("fill", (d) => colorScale(d.length));
 
+	// text to display count of games per bin on top of each rect/bar
 	bar.append("text")
 		.attr("dy", ".75em")
 		.attr("y", "6")
@@ -62,8 +61,10 @@ export const scentedYearView = (selection, props) => {
 
 	hist.append("g").attr("class", "slider-labels").attr("transform", "translate(0, 120)").call(xAxis);
 
+	// make a copy so as to not modify original data
 	const dataset = data;
 
+	// add a year slider
 	const slider = selection
 		.append("g")
 		.attr("class", "slider")
@@ -108,11 +109,15 @@ export const scentedYearView = (selection, props) => {
 				slider.interrupt();
 			})
 			.on("drag end", function () {
+				const xloc = d3.event.x;
 				if (d3.event.active == 1) dx = d3.event.dx;
+				if (getYear(xloc) < totalRange[0] || getYear(xloc) > totalRange[1]) return;
+
+				// optimized to only pick up on end event
 				if (d3.event.type == "end") {
-					const currentLeftX = d3.select(".handle.left").attr("cx");
-					const currentRightX = d3.select(".handle.right").attr("cx");
-					const xloc = d3.event.x; // x position of end event
+					const currentLeftX = d3.select(".handle.left").attr("cx"); // x position of left handle
+					const currentRightX = d3.select(".handle.right").attr("cx"); // x position of right handle
+					// x position of end event of drag
 
 					// define conditions of brush movement
 					const rightMovedRight = xloc > currentLeftX + dx && xloc > currentRightX && dx > 0;
@@ -130,16 +135,17 @@ export const scentedYearView = (selection, props) => {
 	);
 
 	function updateStartRange(newLeftX, oldRightX) {
-		const updatedStartYear = Math.round(x.invert(newLeftX));
+		const updatedStartYear = getYear(newLeftX);
+		// move left handle to new position
 		startHandle.transition().delay(250).attr("cx", x(updatedStartYear));
-
-		const endYear = Math.round(x.invert(oldRightX));
+		// right handle position stays unchanged
+		const endYear = getYear(oldRightX);
 		const newRange = [updatedStartYear, endYear];
 
 		// callback to update range
 		onSelectedYearRangeChanged(newRange);
 
-		// histogram bar colors
+		// highlight label color
 		d3.selectAll(".slider-labels")
 			.selectAll(".tick")
 			.select("text")
@@ -151,16 +157,17 @@ export const scentedYearView = (selection, props) => {
 	}
 
 	function updateEndRange(newRightX, oldLeftX) {
-		const updatedEndYear = Math.round(x.invert(newRightX));
+		const updatedEndYear = getYear(newRightX);
+		// move right handle to new position
 		endHandle.transition().delay(250).attr("cx", x(updatedEndYear));
-
-		const startYear = Math.round(x.invert(oldLeftX));
+		// left handle position stays unchanged
+		const startYear = getYear(oldLeftX);
 		const newRange = [startYear, updatedEndYear];
 
 		// callback to update range
 		onSelectedYearRangeChanged(newRange);
 
-		// histogram bar colors
+		// highlight label color
 		d3.selectAll(".slider-labels")
 			.selectAll(".tick")
 			.select("text")

@@ -16,7 +16,6 @@ class MainView {
 		this.microsoft_data = [];
 		this.nintendo_data = [];
 		this.pc_data = [];
-		this.others_data = [];
 	}
 
 	initVis() {
@@ -24,35 +23,28 @@ class MainView {
 
 		vis.svg = d3.select(vis.config.parentElement).attr("width", "100%").attr("height", 900);
 
-		let num_cluster = 5;
-
 		vis.sony_group = vis.svg
 			.append("g")
 			.attr("class", "sony")
-			.attr("x", Math.cos((3.25 / num_cluster) * 2 * Math.PI) * 250 + vis.config.containerWidth / 2)
-			.attr("y", Math.sin((3.25 / num_cluster) * 2 * Math.PI) * 250 + vis.config.containerHeight / 2);
+			.attr("x", vis.config.containerWidth / 4)
+			.attr("y", vis.config.containerHeight / 4);
 		vis.microsoft_group = vis.svg
 			.append("g")
 			.attr("class", "microsoft")
-			.attr("x", Math.cos((4.25 / num_cluster) * 2 * Math.PI) * 250 + vis.config.containerWidth / 2)
-			.attr("y", Math.sin((4.25 / num_cluster) * 2 * Math.PI) * 250 + vis.config.containerHeight / 2);
+			.attr("x", 3 * vis.config.containerWidth / 4)
+			.attr("y", vis.config.containerHeight / 4);
 		vis.nintendo_group = vis.svg
 			.append("g")
 			.attr("class", "nintendo")
-			.attr("x", Math.cos((5.25 / num_cluster) * 2 * Math.PI) * 250 + vis.config.containerWidth / 2)
-			.attr("y", Math.sin((5.25 / num_cluster) * 2 * Math.PI) * 250 + vis.config.containerHeight / 2);
+			.attr("x", vis.config.containerWidth / 4)
+			.attr("y", 3 * vis.config.containerHeight / 4 + 100);
 		vis.pc_group = vis.svg
 			.append("g")
 			.attr("class", "pc")
-			.attr("x", Math.cos((1.25 / num_cluster) * 2 * Math.PI) * 250 + vis.config.containerWidth / 2)
-			.attr("y", Math.sin((1.25 / num_cluster) * 2 * Math.PI) * 250 + vis.config.containerHeight / 2);
-		vis.others_group = vis.svg
-			.append("g")
-			.attr("class", "others")
-			.attr("x", Math.cos((2.25 / num_cluster) * 2 * Math.PI) * 250 + vis.config.containerWidth / 2)
-			.attr("y", Math.sin((2.25 / num_cluster) * 2 * Math.PI) * 250 + vis.config.containerHeight / 2);
+			.attr("x", 3 * vis.config.containerWidth / 4)
+			.attr("y", 3 * vis.config.containerHeight / 4 + 100);
 
-		vis.padding = 2; // padding within cluster
+		vis.padding = 1.5; // padding within cluster
 		vis.selectedGame = "";
 
 		// Tooltip Setup
@@ -61,7 +53,7 @@ class MainView {
 			.append("div")
 			.attr("class", "tooltip")
 			.attr("style", "position: fixed; opacity: 0;");
-		vis.widthCenterPercent = 41.5;
+		vis.widthCenterPercent = 35;
 
 		vis.circleRadius = d3.scaleLinear().domain([vis.salesMin, vis.salesMax]).range([10, 150]);
 
@@ -115,7 +107,6 @@ class MainView {
 			microsoft: this.filterGame(this.microsoft_data),
 			nintendo: this.filterGame(this.nintendo_data),
 			pc: this.filterGame(this.pc_data),
-			others: this.filterGame(this.others_data),
 		};
 
 		vis.filteredDataArray = _.flatten(_.values(this.filteredData));
@@ -132,14 +123,17 @@ class MainView {
 				"center",
 				d3.forceCenter(
 					this.config.containerWidth * (1 - this.widthCenterPercent / 100),
-					this.config.containerHeight / 2
+					this.config.containerHeight / 2 + 30
 				)
 			)
-			.force("cluster", this.cluster().strength(0.2))
+			.force("cluster", this.cluster().strength(0.7))
 			.force("collide", d3.forceCollide((d) => this.circleRadius(d.global_sales) + this.padding).strength(0.7))
+			.force("charge", d3.forceManyBody().strength(0.2))
 			.on("tick", function () {
 				allCircles.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
 			});
+
+			console.log(this.force)
 	}
 
 	render() {
@@ -193,18 +187,6 @@ class MainView {
 			.attr("cy", (d) => +vis.pc_group.attr("y") + Math.random() * vis.padding)
 			.attr("cluster", "pc");
 
-		vis.others_circles = vis.others_group
-			.selectAll(".others-nodes")
-			.data(vis.filteredData["others"])
-			.join("circle")
-			.transition()
-			.attr("class", "others-nodes")
-			.attr("id", (d) => "others" + d.id_num)
-			.attr("r", (d) => vis.circleRadius(d.global_sales))
-			.attr("cx", (d) => +vis.others_group.attr("x") + Math.random() * vis.padding)
-			.attr("cy", (d) => +vis.others_group.attr("y") + Math.random() * vis.padding)
-			.attr("cluster", "others");
-
 		vis.handleSelection();
 		vis.handleColor(vis.widgetPane.selectedOption);
 	}
@@ -241,8 +223,8 @@ class MainView {
 					"<br/> Global Sales: " +
 					d.global_sales + "M"
 				)
-				.style("top", "400px")
-				.style("left", 1220 - +d3.select(".tooltip").style("width").replace("px", "") / 2 + "px");
+				.style("top", "430px")
+				.style("left", 1300 - +d3.select(".tooltip").style("width").replace("px", "") / 2 + "px");
 
 				vis.selectedGame = localSelected;
 			})
@@ -269,7 +251,6 @@ class MainView {
 		const m_result = this.microsoft_data.find((d) => d.name === name);
 		const n_result = this.nintendo_data.find((d) => d.name === name);
 		const p_result = this.pc_data.find((d) => d.name === name);
-		const o_result = this.others_data.find((d) => d.name === name);
 
 		if (s_result !== undefined && s_result.console_company !== company)
 			relatedIDs.push(s_result.console_company + s_result.id_num);
@@ -279,8 +260,6 @@ class MainView {
 			relatedIDs.push(n_result.console_company + n_result.id_num);
 		if (p_result !== undefined && p_result.console_company !== company)
 			relatedIDs.push(p_result.console_company + p_result.id_num);
-		if (o_result !== undefined && o_result.console_company !== company)
-			relatedIDs.push(o_result.console_company + o_result.id_num);
 
 		return relatedIDs;
 	}

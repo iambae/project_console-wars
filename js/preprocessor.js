@@ -21,9 +21,6 @@ export const preprocessor = d3.csv("data/games.csv").then(data => {
 			],
 			[
 				/*PC*/
-			],
-			[
-				/*Others*/
 			]
 		];
 		for (const [i, d] of data.entries()) {
@@ -68,9 +65,6 @@ export const preprocessor = d3.csv("data/games.csv").then(data => {
 			} else if (d.Platform == "PC") {
 				game.console_company = "pc";
 				games[3].push(game);
-			} else {
-				game.console_company = "others";
-				games[4].push(game);
 			}
 		}
 		return games;

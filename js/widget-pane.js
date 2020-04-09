@@ -12,8 +12,8 @@ export default class WidgetPane {
 				top: 10,
 				bottom: 10,
 				right: 10,
-				left: 10
-			}
+				left: 10,
+			},
 		};
 
 		this.genreList = [];
@@ -39,6 +39,10 @@ export default class WidgetPane {
 
 		// Add to wiget pane a scented widget for selecting years of game release
 		vis.scentedYearView = vis.div.select("#date-chart").append("svg");
+		d3.select(".header.year")
+			.append("text")
+			.attr("class", "year-range-text")
+			.text(`${vis.selectedYearRange[0]} ~ ${vis.selectedYearRange[1]}`);
 
 		// Add critic score filter to wiget pane
 		vis.critScoreFilterWidget = d3
@@ -55,7 +59,7 @@ export default class WidgetPane {
 			.attr("transform", "translate(100, 100)");
 
 		// Add filter view for each game score type
-		_.map(_.keys(vis.scoreData), type => {
+		_.map(_.keys(vis.scoreData), (type) => {
 			vis.initFilterWidget(type);
 		});
 
@@ -75,32 +79,33 @@ export default class WidgetPane {
 		// SELECT GAMES BY GENRE
 		vis.dropdownGenreWidget.call(dropdownGenreWidget, {
 			options: vis.genreList,
-			onOptionSelected: option => {
+			onOptionSelected: (option) => {
 				vis.selectedGenre = option;
 				vis.mainView.update();
 			},
-			selectedGenre: vis.selectedGenre || vis.genreList[0]
+			selectedGenre: vis.selectedGenre || vis.genreList[0],
 		});
 
 		// SELECT DISPLAYED SCORE TYPE
 		vis.dropdownScoreWidget.call(dropdownScoreWidget, {
 			options: _.map(_.values(vis.scoreData), "name"),
-			onOptionSelected: option => {
+			onOptionSelected: (option) => {
 				vis.selectedOption = option;
 				vis.mainView.handleColor(option);
 			},
-			selectedOption: vis.selectedOption
+			selectedOption: vis.selectedOption,
 		});
 
 		// SELECT GAMES BY RELEASE YEAR
 		vis.scentedYearView.call(scentedYearView, {
 			data: vis.data,
-			defaultYear: vis.selectedYear,
+			defaultYearRange: vis.selectedYearRange,
 			totalRange: [vis.yearList[0], vis.yearList[vis.yearList.length - 1]],
-			onSelectedYearChanged: value => {
-				vis.selectedYear = value;
+			onSelectedYearRangeChanged: (range) => {
+				d3.select(".year-range-text").text(`${range[0]} ~ ${range[1]}`);
+				vis.selectedYearRange = range;
 				vis.mainView.update();
-			}
+			},
 		});
 	}
 
@@ -115,9 +120,9 @@ export default class WidgetPane {
 				top: 20,
 				bottom: 20,
 				left: 0,
-				right: 20
+				right: 20,
 			},
-			bucketSize: 5
+			bucketSize: 5,
 		};
 
 		const [min, max] = d3.extent(this.scoreData[scoreType].all);
@@ -135,31 +140,27 @@ export default class WidgetPane {
 			? vis.critScoreFilterWidget.join("g").attr("class", "container")
 			: vis.userScoreFilterWidget.join("g").attr("class", "container");
 
-		const roundScale = d => Math.round(xScale(d) / 5) * 5;
+		const roundScale = (d) => Math.round(xScale(d) / 5) * 5;
 		// create x scale
-		const xScale = d3
-			.scaleLinear()
-			.domain(range)
-			.range([0, width])
-			.nice();
+		const xScale = d3.scaleLinear().domain(range).range([0, width]).nice();
 		const xAxis = d3.axisBottom().scale(xScale);
 
 		let bar =
 			scoreType == "critics"
 				? vis.critScoreFilterWidget
-					.selectAll("g")
-					.data(scoreRange)
-					.enter()
-					.append("g")
-					.call(xAxis)
-					.attr("x", d => roundScale(d))
+						.selectAll("g")
+						.data(scoreRange)
+						.enter()
+						.append("g")
+						.call(xAxis)
+						.attr("x", (d) => roundScale(d))
 				: vis.userScoreFilterWidget
-					.selectAll("g")
-					.data(scoreRange)
-					.enter()
-					.append("g")
-					.call(xAxis)
-					.attr("x", d => roundScale(d));
+						.selectAll("g")
+						.data(scoreRange)
+						.enter()
+						.append("g")
+						.call(xAxis)
+						.attr("x", (d) => roundScale(d));
 
 		bar.selectAll("text")
 			.attr("y", 0)
@@ -175,12 +176,12 @@ export default class WidgetPane {
 
 		const gradientScale = bar
 			.append("rect")
-			.attr("x", d => xScale(d))
+			.attr("x", (d) => xScale(d))
 			.attr("y", height - 110)
 			.attr("width", width / (range[1] - range[0]))
 			.attr("height", 110)
-			.style("fill", d => color(d))
-			.style("stroke", d => color(d));
+			.style("fill", (d) => color(d))
+			.style("stroke", (d) => color(d));
 
 		// Define brush
 		// (from https://observablehq.com/@trebor/snapping-histogram-slider)
@@ -188,7 +189,7 @@ export default class WidgetPane {
 			.brushX()
 			.extent([
 				[0, 0],
-				[width, height]
+				[width, height],
 			])
 			.on("brush", function () {
 				let s = d3.event.selection;
@@ -208,10 +209,10 @@ export default class WidgetPane {
 				// move these two lines into the on('end') part below
 
 				if (scoreType == "critics") {
-					vis.critScoreFilterWidget.node().value = s.map(d => bucketSize * Math.round(xScale.invert(d)));
+					vis.critScoreFilterWidget.node().value = s.map((d) => bucketSize * Math.round(xScale.invert(d)));
 					vis.critScoreFilterWidget.node().dispatchEvent(new CustomEvent("input"));
 				} else {
-					vis.userScoreFilterWidget.node().value = s.map(d => bucketSize * Math.round(xScale.invert(d)));
+					vis.userScoreFilterWidget.node().value = s.map((d) => bucketSize * Math.round(xScale.invert(d)));
 					vis.userScoreFilterWidget.node().dispatchEvent(new CustomEvent("input"));
 				}
 			})
@@ -219,9 +220,7 @@ export default class WidgetPane {
 				if (!d3.event.sourceEvent) return;
 				let d0 = d3.event.selection.map(xScale.invert);
 				let d1 = d0.map(Math.round);
-				d3.select(this)
-					.transition()
-					.call(d3.event.target.move, d1.map(xScale));
+				d3.select(this).transition().call(d3.event.target.move, d1.map(xScale));
 
 				vis.mainView.update();
 			});
@@ -229,14 +228,8 @@ export default class WidgetPane {
 		// Append brush to g
 		let gBrush =
 			scoreType == "critics"
-				? vis.critScoreFilterWidget
-					.append("g")
-					.attr("class", "brush")
-					.call(brush)
-				: vis.userScoreFilterWidget
-					.append("g")
-					.attr("class", "brush")
-					.call(brush);
+				? vis.critScoreFilterWidget.append("g").attr("class", "brush").call(brush)
+				: vis.userScoreFilterWidget.append("g").attr("class", "brush").call(brush);
 
 		// Add brush handles (from https://bl.ocks.org/Fil/2d43867ba1f36a05459c7113c7f6f98a)
 		let brushResizePath = function (d) {

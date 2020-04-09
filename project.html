@@ -1,38 +1,20 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>Console War</title>
-		<link
-			rel="stylesheet"
-			href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-			integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
-			crossorigin="anonymous"
-		/>
-		<link rel="stylesheet" type="text/css" href="css/style.css" />
-		<link rel="icon" type="image/png" href="css/favicon.ico" />
-	</head>
 
-	<body>
-		<div class="container-fluid">
-			<div class="row">
-				<div class="col-md-5 view-col widget-pane">
-					<div id="widgets">
-						<div class="header genre">
-							<p>Select games by genre</p>
-						</div>
-						<div class="header score">
-							<p>Select games by score</p>
-							<span>Critics score:&emsp;&emsp;&emsp;&emsp;&emsp;</span><span>User score:</span>
-						</div>
-						<div id="critic" class="score-chart"></div>
-						<div id="user" class="score-chart"></div>
-						<div class="header score-option">
-							<p>Select displayed score type</p>
-						</div>
-						<div class="header year">
-							<p>Select games by release year:</p>
-						</div>
-						<div id="date-chart"></div>
+<head>
+	<title>Console War</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+		integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+	<link rel="stylesheet" type="text/css" href="css/style.css" />
+</head>
+
+<body>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-4 view-col widget-pane">
+				<div id="widgets">
+					<div class="header genre">
+						<p>Select games by genre</p>
 					</div>
 					<div class="header score">
 						<p>Select games by score</p>
@@ -49,7 +31,7 @@
 					<div id="date-chart"></div>
 				</div>
 			</div>
-			<div class="col-md-8 view-col main-view">
+			<div class="col-md-7 view-col main-view">
 				<svg id="main"></svg>
 				<div id="legend" style="display: inline-block;"></div>
 			</div>

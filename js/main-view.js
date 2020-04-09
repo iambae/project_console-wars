@@ -132,8 +132,6 @@ class MainView {
 			.on("tick", function () {
 				allCircles.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
 			});
-
-			console.log(this.force)
 	}
 
 	render() {

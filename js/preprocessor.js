@@ -1,10 +1,12 @@
 export const preprocessor = d3.csv("data/games.csv").then(data => {
 	let salesMax = 0,
-		salesMin = Infinity,
 		criticMax = 0,
-		criticMin = Infinity,
 		userMax = 0,
-		userMin = Infinity;
+		maxScoreDiff = 0,
+		salesMin = Infinity,
+		criticMin = Infinity,
+		userMin = Infinity,
+		minScoreDiff = Infinity;
 
 	function formatDataForMain() {
 		const games = [
@@ -26,13 +28,6 @@ export const preprocessor = d3.csv("data/games.csv").then(data => {
 		];
 		for (const [i, d] of data.entries()) {
 			if (d.Critic_Score === "" || d.User_Score === "") continue;
-			// update max min
-			if (salesMax < +d.Global_Sales) salesMax = +d.Global_Sales;
-			if (salesMin > +d.Global_Sales) salesMin = +d.Global_Sales;
-			if (criticMax < +d.Critic_Score) criticMax = +d.Critic_Score;
-			if (criticMin > +d.Critic_Score) criticMin = +d.Critic_Score;
-			if (userMax < +d.User_Score * 10) userMax = +d.User_Score * 10;
-			if (userMin > +d.User_Score * 10) userMin = +d.User_Score * 10;
 
 			const game = {};
 			game.name = d.Name;
@@ -47,7 +42,18 @@ export const preprocessor = d3.csv("data/games.csv").then(data => {
 			game.global_sales = +d.Global_Sales;
 			game.crit_score = +d.Critic_Score;
 			game.user_score = +d.User_Score * 10;
+			game.score_diff = game.user_score - game.crit_score;
 			game.id_num = i;
+
+			// update max min
+			if (salesMax < game.global_sales) salesMax = game.global_sales;
+			if (salesMin > game.global_sales) salesMin = game.global_sales;
+			if (criticMax < game.crit_score) criticMax = game.crit_score;
+			if (criticMin > game.crit_score) criticMin = game.crit_score;
+			if (userMax < game.user_score) userMax = game.user_score;
+			if (userMin > game.user_score) userMin = game.user_score;
+			if (maxScoreDiff < game.score_diff) maxScoreDiff = game.score_diff;
+			if (minScoreDiff > game.score_diff) minScoreDiff = game.score_diff;
 
 			// Add platform_company column
 			if (d.Platform.match(/^(PS|PS2|PS3|PS4|PSP|PSV)$/)) {
@@ -72,5 +78,5 @@ export const preprocessor = d3.csv("data/games.csv").then(data => {
 
 	const mainViewData = formatDataForMain();
 
-	return { mainViewData, salesMax, salesMin, criticMax, criticMin, userMax, userMin };
+	return { mainViewData, salesMax, salesMin, criticMax, criticMin, userMax, userMin, maxScoreDiff, minScoreDiff };
 });

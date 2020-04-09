@@ -4,8 +4,18 @@ import WidgetPane from "./widget-pane.js";
 const mainView = new MainView({ parentElement: "#main" });
 const widgetPane = new WidgetPane({ parentElement: "#widgets" }, mainView);
 
-preprocessor.then(processedData => {
-	const { mainViewData, salesMax, salesMin, criticMax, criticMin, userMax, userMin } = processedData;
+preprocessor.then((processedData) => {
+	const {
+		mainViewData,
+		salesMax,
+		salesMin,
+		criticMax,
+		criticMin,
+		userMax,
+		userMin,
+		maxScoreDiff,
+		minScoreDiff,
+	} = processedData;
 	widgetPane.data = _.flatMap(mainViewData);
 
 	mainView.sony_data = mainViewData[0];
@@ -19,6 +29,8 @@ preprocessor.then(processedData => {
 	mainView.criticMin = criticMin;
 	mainView.userMax = userMax;
 	mainView.userMin = userMin;
+	mainView.maxScoreDiff = maxScoreDiff;
+	mainView.minScoreDiff = minScoreDiff;
 
 	// Initialize widget pane with default values
 	// Default game genre to show
@@ -27,25 +39,31 @@ preprocessor.then(processedData => {
 
 	// Default release years of games
 	widgetPane.yearList = _.uniq(_.map(widgetPane.data, "year"))
-		.filter(year => !Number.isNaN(year))
+		.filter((year) => !Number.isNaN(year))
 		.sort();
-	widgetPane.selectedYear = 2013;
+	widgetPane.selectedYearRange = [2005, 2013];
 
 	// Default game score data
 	widgetPane.selectedOption = "Critics";
 	widgetPane.scoreData = {
 		critics: {
 			name: "Critics", // for dropdown
-			default: [40, 90],
+			default: [40, 70],
 			all: [criticMin, criticMax],
-			color: d3.interpolateBlues
+			color: d3.interpolateBlues,
 		},
 		users: {
 			name: "Users", // for dropdown
-			default: [40, 90],
+			default: [40, 70],
 			all: [userMin, userMax],
-			color: d3.interpolatePurples
-		}
+			color: d3.interpolateReds,
+		},
+		diff: {
+			name: "Differences", // for dropdown
+			default: [40, 90],
+			all: [maxScoreDiff, minScoreDiff],
+			color: d3.interpolateRdBu,
+		},
 	};
 
 	widgetPane.initVis();

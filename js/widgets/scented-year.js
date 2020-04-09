@@ -141,7 +141,7 @@ export const scentedYearView = (selection, props) => {
 		// right handle position stays unchanged
 		const endYear = getYear(oldRightX);
 		const newRange = [updatedStartYear, endYear];
-		console.log(newRange);
+
 		// callback to update range
 		onSelectedYearRangeChanged(newRange);
 
@@ -163,7 +163,7 @@ export const scentedYearView = (selection, props) => {
 		// left handle position stays unchanged
 		const startYear = getYear(oldLeftX);
 		const newRange = [startYear, updatedEndYear];
-		console.log(newRange);
+
 		// callback to update range
 		onSelectedYearRangeChanged(newRange);
 

@@ -61,7 +61,7 @@ class MainView {
 			.append("div")
 			.attr("class", "tooltip")
 			.attr("style", "position: fixed; opacity: 0;");
-		vis.widthCenterPercent = 41.5;
+		vis.widthCenterPercent = 55;
 
 		vis.circleRadius = d3.scaleLinear().domain([vis.salesMin, vis.salesMax]).range([10, 150]);
 
@@ -242,7 +242,7 @@ class MainView {
 					d.global_sales + "M"
 				)
 				.style("top", "400px")
-				.style("left", 1220 - +d3.select(".tooltip").style("width").replace("px", "") / 2 + "px");
+				.style("left", 1000 - +d3.select(".tooltip").style("width").replace("px", "") / 2 + "px");
 
 				vis.selectedGame = localSelected;
 			})

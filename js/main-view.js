@@ -195,7 +195,7 @@ class MainView {
 		let vis = this;
 		vis.svg
 			.selectAll("circle")
-			.on("mouseover", (d) => {
+			.on("mouseover", d => {
 				// if not selected, select it
 				const localSelected = d.console_company + d.id_num;
 
@@ -228,7 +228,16 @@ class MainView {
 
 				vis.selectedGame = localSelected;
 			})
-			.on("mouseout", (d) => {
+			.on("click", d => {
+				if (d3.select("#pieChart").select("*").empty()) {
+					vis.initDonut(d);
+					d3.select(".tooltip").style("opacity", 0); // Hide tooltips
+				} else {
+					d3.select("#pieChart").select("*").remove();
+					d3.select(".tooltip").style("opacity", 1); // Hide tooltips
+				}
+			})
+			.on("mouseout", d => {
 				// if selected, unselect it
 				d3.select("#" + vis.selectedGame)
 					.style("stroke", "black")
@@ -240,6 +249,8 @@ class MainView {
 				});
 
 				d3.select(".tooltip").style("opacity", 0); // Hide tooltips
+
+				d3.select("#pieChart").select("*").remove();
 
 				vis.selectedGame = "";
 			});
@@ -343,6 +354,96 @@ class MainView {
 			.call(legendaxis);
 	}
 
+	initDonut(d) {
+		const na_sales = +d.na_sales == 0 ? 0.0001 : +d.na_sales;
+		const eu_sales = +d.eu_sales == 0 ? 0.0001 : +d.eu_sales;
+		const jp_sales = +d.jp_sales == 0 ? 0.0001 : +d.jp_sales;
+		const other_sales = +d.other_sales == 0 ? 0.0001 : +d.other_sales;
+		const pie = new d3pie("pieChart", {
+			"header": {
+				"title": {
+					"text": "Sales By Region",
+					"fontSize": 15
+				},
+				"subtitle": {
+					"color": "#999999",
+					"fontSize": 10,
+					"font": "courier"
+				},
+				"location": "pie-center",
+				"titleSubtitlePadding": 0
+			},
+			"size": {
+				"canvasWidth": 320,
+				"pieInnerRadius": "82%",
+				"pieOuterRadius": "55%"
+			},
+			"data": {
+				"sortOrder": "label-desc",
+				"content": [
+					{
+						"label": "North America",
+						"value": na_sales,
+						"color": "#333333"
+					},
+					{
+						"label": "Europe",
+						"value": eu_sales,
+						"color": "#444444"
+					},
+					{
+						"label": "Japan",
+						"value": jp_sales,
+						"color": "#555555"
+					},
+					{
+						"label": "Others",
+						"value": other_sales,
+						"color": "#666666"
+					}
+				]
+			},
+			"labels": {
+				"outer": {
+					"format": "label-percentage1",
+					"pieDistance": 9
+				},
+				"inner": {
+					"format": "none"
+				},
+				"mainLabel": {
+					"fontSize": 11
+				},
+				"percentage": {
+					"color": "#999999",
+					"fontSize": 11,
+					"decimalPlaces": 0
+				},
+				"value": {
+					"color": "#cccc43",
+					"fontSize": 11
+				},
+				"lines": {
+					"enabled": true,
+					"color": "#777777"
+				},
+				"truncation": {
+					"enabled": true
+				}
+			},
+			"effects": {
+				"load": {
+					"speed": 50
+				}
+			},
+			"misc": {
+				"colors": {
+					"segmentStroke": "#000000"
+				}
+			}
+		});
+	}
+	
 	// Move d to be adjacent to the cluster node.
 	// from: https://bl.ocks.org/ericsoco/cd0c38a20141e997e926592264067db3
 	cluster() {

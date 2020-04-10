@@ -2,15 +2,44 @@
 <html>
   <head>
     <title>Console Wars</title>
-    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/controller-style.css" />
   </head>
   <body>
-    <div id="controllers">
-      <svg id="microsoft"></svg>
-      <svg id="sony"></svg>
-      <svg id="nintendo"></svg>
-      <svg id="pc"></svg>
-      <svg id="other"></svg>
+    <!-- <h1 id="header">Console Wars</h1> -->
+    <div class="container">
+      <div id="graphic">
+        <!-- Display the information here -->
+        <div id="sections">
+          <section class="step">
+            <div class="title">
+              <p>Microsoft</p>
+            </div>
+          </section>
+          <section class="step">
+            <div class="title">
+              <p>Sony</p>
+            </div>
+          </section>
+          <section class="step">
+            <div class="title">
+              <p>Nintendo</p>
+            </div>
+          </section>
+          <section class="step">
+            <div class="title">
+              <p>PC</p>
+            </div>
+          </section>
+          <section class="step">
+            <div class="title">
+              <p>Others</p>
+            </div>
+          </section>
+        </div>
+        <!-- Display the controller here -->
+        <svg id="vis"></svg>
+        <div id="extra-space"></div>
+      </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://d3js.org/topojson.v3.min.js"></script>
@@ -25,6 +54,7 @@
     <script type="module" src="js/preprocessing.js"></script>
     <script type="module" src="js/canvas.js"></script>
     <script type="module" src="js/game-controller-view.js"></script>
+    <script src="js/scroller.js"></script>
     <script type="module" src="js/index.js"></script>
   </body>
 </html>

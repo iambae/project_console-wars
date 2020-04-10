@@ -38,26 +38,40 @@ class GameControllerView extends Canvas {
     return data.reduce((max, b) => Math.max(max, b[attr]), data[0][attr])
   }
 
-  update() {
+  init() {
     let vis = this
-
-    vis.render()
-  }
-
-  render() {
-    let vis = this
-
-    vis.chart
+    vis.rects = vis.chart
       .selectAll("rect")
       .data(vis.rectPoints)
       .enter()
       .append("rect")
       .attr("id", (d) => vis.type + d.id)
+      .classed(vis.type, true)
       .attr("width", (d) => d.size)
       .attr("height", (d) => d.size)
       .attr("x", (d) => d.x)
       .attr("y", (d) => d.y)
       .attr("fill", (d) => d.color)
+      .attr("opacity", 0)
+  }
+
+  update() {
+    let vis = this
+    vis.render()
+  }
+
+  render() {
+    let vis = this
+  }
+
+  hide() {
+    let vis = this
+    vis.chart.selectAll(`rect`).transition().duration(0).attr("opacity", 0)
+  }
+
+  highlight() {
+    let vis = this
+    vis.chart.selectAll(`rect`).transition().duration(0).attr("opacity", 1.0)
   }
 }
 

@@ -5,17 +5,7 @@ const mainView = new MainView({ parentElement: "#main" });
 const widgetPane = new WidgetPane({ parentElement: "#widgets" }, mainView);
 
 preprocessor.then((processedData) => {
-	const {
-		mainViewData,
-		salesMax,
-		salesMin,
-		criticMax,
-		criticMin,
-		userMax,
-		userMin,
-		maxScoreDiff,
-		minScoreDiff,
-	} = processedData;
+	const { mainViewData, salesMax, salesMin, metadata } = processedData;
 	widgetPane.data = _.flatMap(mainViewData);
 
 	mainView.sony_data = mainViewData[0];
@@ -25,47 +15,29 @@ preprocessor.then((processedData) => {
 	mainView.others_data = mainViewData[4];
 	mainView.salesMax = salesMax;
 	mainView.salesMin = salesMin;
-	mainView.criticMax = criticMax;
-	mainView.criticMin = criticMin;
-	mainView.userMax = userMax;
-	mainView.userMin = userMin;
-	mainView.maxScoreDiff = maxScoreDiff;
-	mainView.minScoreDiff = minScoreDiff;
+	mainView.criticMax = metadata[0];
+	mainView.criticMin = metadata[1];
+	mainView.userMax = metadata[2];
+	mainView.userMin = metadata[3];
+	mainView.maxScoreDiff = metadata[4];
+	mainView.minScoreDiff = metadata[5];
 
-	// Initialize widget pane with default values
-	// Default game genre to show
 	widgetPane.genreList = _.uniq(_.map(widgetPane.data, "genre")).sort();
-	widgetPane.selectedGenre = widgetPane.genreList[8];
-
-	// Default release years of games
 	widgetPane.yearList = _.uniq(_.map(widgetPane.data, "year"))
 		.filter((year) => !Number.isNaN(year))
 		.sort();
-	widgetPane.selectedYearRange = [2005, 2013];
 
-	// Default game score data
-	widgetPane.selectedOption = "Critics";
-	widgetPane.scoreData = {
-		critics: {
-			name: "Critics", // for dropdown
-			default: [40, 70],
-			all: [criticMin, criticMax],
-			color: d3.interpolateBlues,
-		},
-		users: {
-			name: "Users", // for dropdown
-			default: [40, 70],
-			all: [userMin, userMax],
-			color: d3.interpolateReds,
-		},
-		diff: {
-			name: "Differences", // for dropdown
-			default: [40, 90],
-			all: [maxScoreDiff, minScoreDiff],
-			color: d3.interpolateRdBu,
-		},
+	// Initialize widget pane with hardcoded "default" values
+	const defaults = {
+		selectedGenre: widgetPane.genreList[8], // Default game genre to show
+		selectedYearRange: [2005, 2013], // Default release years of games
+		selectedOption: "Critics", // Default game score data
+		selectedCriticScoreRange: [40, 70],
+		selectedUserScoreRange: [40, 70],
+		selectedDiffScoreRange: [40, 70],
 	};
 
+	widgetPane.setDefaults(defaults, metadata);
 	widgetPane.initVis();
 
 	mainView.widgetPane = widgetPane;

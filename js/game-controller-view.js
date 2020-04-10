@@ -5,6 +5,7 @@ class GameControllerView extends Canvas {
     super(_config)
     this.type = _config.type
     this.filename = _config.filename
+    this.scale = _config.scale
     this.initVis()
   }
 
@@ -16,7 +17,10 @@ class GameControllerView extends Canvas {
       .attr("width", vis.config.containerWidth)
       .attr("height", vis.config.containerHeight)
 
-    vis.chart = vis.svg.append("g").attr("class", "main-group")
+    vis.chart = vis.svg
+      .append("g")
+      .attr("class", "main-group")
+      .attr("transform", `scale(${vis.scale})`)
 
     d3.csv(`data/${vis.filename}`).then((data) => {
       data.forEach((point) => {

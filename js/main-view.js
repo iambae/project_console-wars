@@ -16,7 +16,6 @@ export default class MainView {
     this.microsoft_data = []
     this.nintendo_data = []
     this.pc_data = []
-    this.others_data = []
   }
 
   initVis() {
@@ -27,75 +26,28 @@ export default class MainView {
       .attr("width", "100%")
       .attr("height", 900)
 
-    let num_cluster = 5
-
     vis.sony_group = vis.svg
       .append("g")
       .attr("class", "sony")
-      .attr(
-        "x",
-        Math.cos((3.25 / num_cluster) * 2 * Math.PI) * 250 +
-          vis.config.containerWidth / 2
-      )
-      .attr(
-        "y",
-        Math.sin((3.25 / num_cluster) * 2 * Math.PI) * 250 +
-          vis.config.containerHeight / 2
-      )
+      .attr("x", vis.config.containerWidth / 4)
+      .attr("y", vis.config.containerHeight / 4)
     vis.microsoft_group = vis.svg
       .append("g")
       .attr("class", "microsoft")
-      .attr(
-        "x",
-        Math.cos((4.25 / num_cluster) * 2 * Math.PI) * 250 +
-          vis.config.containerWidth / 2
-      )
-      .attr(
-        "y",
-        Math.sin((4.25 / num_cluster) * 2 * Math.PI) * 250 +
-          vis.config.containerHeight / 2
-      )
+      .attr("x", (3 * vis.config.containerWidth) / 4)
+      .attr("y", vis.config.containerHeight / 4)
     vis.nintendo_group = vis.svg
       .append("g")
       .attr("class", "nintendo")
-      .attr(
-        "x",
-        Math.cos((5.25 / num_cluster) * 2 * Math.PI) * 250 +
-          vis.config.containerWidth / 2
-      )
-      .attr(
-        "y",
-        Math.sin((5.25 / num_cluster) * 2 * Math.PI) * 250 +
-          vis.config.containerHeight / 2
-      )
+      .attr("x", vis.config.containerWidth / 4)
+      .attr("y", (3 * vis.config.containerHeight) / 4 + 100)
     vis.pc_group = vis.svg
       .append("g")
       .attr("class", "pc")
-      .attr(
-        "x",
-        Math.cos((1.25 / num_cluster) * 2 * Math.PI) * 250 +
-          vis.config.containerWidth / 2
-      )
-      .attr(
-        "y",
-        Math.sin((1.25 / num_cluster) * 2 * Math.PI) * 250 +
-          vis.config.containerHeight / 2
-      )
-    vis.others_group = vis.svg
-      .append("g")
-      .attr("class", "others")
-      .attr(
-        "x",
-        Math.cos((2.25 / num_cluster) * 2 * Math.PI) * 250 +
-          vis.config.containerWidth / 2
-      )
-      .attr(
-        "y",
-        Math.sin((2.25 / num_cluster) * 2 * Math.PI) * 250 +
-          vis.config.containerHeight / 2
-      )
+      .attr("x", (3 * vis.config.containerWidth) / 4)
+      .attr("y", (3 * vis.config.containerHeight) / 4 + 100)
 
-    vis.padding = 2 // padding within cluster
+    vis.padding = 1.5 // padding within cluster
     vis.selectedGame = ""
 
     // Tooltip Setup
@@ -104,7 +56,7 @@ export default class MainView {
       .append("div")
       .attr("class", "tooltip")
       .attr("style", "position: fixed; opacity: 0;")
-    vis.widthCenterPercent = 55
+    vis.widthCenterPercent = 35
 
     vis.circleRadius = d3
       .scaleLinear()
@@ -169,7 +121,6 @@ export default class MainView {
       microsoft: this.filterGame(this.microsoft_data),
       nintendo: this.filterGame(this.nintendo_data),
       pc: this.filterGame(this.pc_data),
-      others: this.filterGame(this.others_data),
     }
 
     vis.filteredDataArray = _.flatten(_.values(this.filteredData))
@@ -186,16 +137,17 @@ export default class MainView {
         "center",
         d3.forceCenter(
           this.config.containerWidth * (1 - this.widthCenterPercent / 100),
-          this.config.containerHeight / 2
+          this.config.containerHeight / 2 + 30
         )
       )
-      .force("cluster", this.cluster().strength(0.2))
+      .force("cluster", this.cluster().strength(0.7))
       .force(
         "collide",
         d3
           .forceCollide((d) => this.circleRadius(d.global_sales) + this.padding)
           .strength(0.7)
       )
+      .force("charge", d3.forceManyBody().strength(0.2))
       .on("tick", function () {
         allCircles.attr("cx", (d) => d.x).attr("cy", (d) => d.y)
       })
@@ -270,24 +222,6 @@ export default class MainView {
       .attr("cy", (d) => +vis.pc_group.attr("y") + Math.random() * vis.padding)
       .attr("cluster", "pc")
 
-    vis.others_circles = vis.others_group
-      .selectAll(".others-nodes")
-      .data(vis.filteredData["others"])
-      .join("circle")
-      .transition()
-      .attr("class", "others-nodes")
-      .attr("id", (d) => "others" + d.id_num)
-      .attr("r", (d) => vis.circleRadius(d.global_sales))
-      .attr(
-        "cx",
-        (d) => +vis.others_group.attr("x") + Math.random() * vis.padding
-      )
-      .attr(
-        "cy",
-        (d) => +vis.others_group.attr("y") + Math.random() * vis.padding
-      )
-      .attr("cluster", "others")
-
     vis.handleSelection()
     vis.handleColor(vis.widgetPane.selectedOption)
   }
@@ -324,10 +258,19 @@ export default class MainView {
 					"<br/> Global Sales: " +
 					d.global_sales + "M"
 				)
-				.style("top", "400px")
-				.style("left", 1000 - +d3.select(".tooltip").style("width").replace("px", "") / 2 + "px");
+				.style("top", "430px")
+				.style("left", 1300 - +d3.select(".tooltip").style("width").replace("px", "") / 2 + "px");
 
         vis.selectedGame = localSelected
+      })
+      .on("click", (d) => {
+        if (d3.select("#pieChart").select("*").empty()) {
+          vis.initDonut(d)
+          d3.select(".tooltip").style("opacity", 0) // Hide tooltips
+        } else {
+          d3.select("#pieChart").select("*").remove()
+          d3.select(".tooltip").style("opacity", 1) // Hide tooltips
+        }
       })
       .on("mouseout", (d) => {
         // if selected, unselect it
@@ -342,6 +285,8 @@ export default class MainView {
 
         d3.select(".tooltip").style("opacity", 0) // Hide tooltips
 
+        d3.select("#pieChart").select("*").remove()
+
         vis.selectedGame = ""
       })
   }
@@ -352,7 +297,6 @@ export default class MainView {
     const m_result = this.microsoft_data.find((d) => d.name === name)
     const n_result = this.nintendo_data.find((d) => d.name === name)
     const p_result = this.pc_data.find((d) => d.name === name)
-    const o_result = this.others_data.find((d) => d.name === name)
 
     if (s_result !== undefined && s_result.console_company !== company)
       relatedIDs.push(s_result.console_company + s_result.id_num)
@@ -362,8 +306,6 @@ export default class MainView {
       relatedIDs.push(n_result.console_company + n_result.id_num)
     if (p_result !== undefined && p_result.console_company !== company)
       relatedIDs.push(p_result.console_company + p_result.id_num)
-    if (o_result !== undefined && o_result.console_company !== company)
-      relatedIDs.push(o_result.console_company + o_result.id_num)
 
     return relatedIDs
   }
@@ -452,6 +394,96 @@ export default class MainView {
       .style("color", "black")
       .style("font-size", "15px")
       .call(legendaxis)
+  }
+
+  initDonut(d) {
+    const na_sales = +d.na_sales == 0 ? 0.0001 : +d.na_sales
+    const eu_sales = +d.eu_sales == 0 ? 0.0001 : +d.eu_sales
+    const jp_sales = +d.jp_sales == 0 ? 0.0001 : +d.jp_sales
+    const other_sales = +d.other_sales == 0 ? 0.0001 : +d.other_sales
+    const pie = new d3pie("pieChart", {
+      header: {
+        title: {
+          text: "Sales By Region",
+          fontSize: 15,
+        },
+        subtitle: {
+          color: "#999999",
+          fontSize: 10,
+          font: "courier",
+        },
+        location: "pie-center",
+        titleSubtitlePadding: 0,
+      },
+      size: {
+        canvasWidth: 320,
+        pieInnerRadius: "82%",
+        pieOuterRadius: "55%",
+      },
+      data: {
+        sortOrder: "label-desc",
+        content: [
+          {
+            label: "North America",
+            value: na_sales,
+            color: "#333333",
+          },
+          {
+            label: "Europe",
+            value: eu_sales,
+            color: "#444444",
+          },
+          {
+            label: "Japan",
+            value: jp_sales,
+            color: "#555555",
+          },
+          {
+            label: "Others",
+            value: other_sales,
+            color: "#666666",
+          },
+        ],
+      },
+      labels: {
+        outer: {
+          format: "label-percentage1",
+          pieDistance: 9,
+        },
+        inner: {
+          format: "none",
+        },
+        mainLabel: {
+          fontSize: 11,
+        },
+        percentage: {
+          color: "#999999",
+          fontSize: 11,
+          decimalPlaces: 0,
+        },
+        value: {
+          color: "#cccc43",
+          fontSize: 11,
+        },
+        lines: {
+          enabled: true,
+          color: "#777777",
+        },
+        truncation: {
+          enabled: true,
+        },
+      },
+      effects: {
+        load: {
+          speed: 50,
+        },
+      },
+      misc: {
+        colors: {
+          segmentStroke: "#000000",
+        },
+      },
+    })
   }
 
   // Move d to be adjacent to the cluster node.

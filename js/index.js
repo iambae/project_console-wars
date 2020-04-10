@@ -80,6 +80,7 @@ preprocessor.then((processedData) => {
     maxScoreDiff,
     minScoreDiff,
   } = processedData
+  console.log(mainViewData)
   widgetPane.data = _.flatMap(mainViewData)
 
   mainView.sony_data = mainViewData[0]

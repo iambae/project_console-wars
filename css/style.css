@@ -1,12 +1,106 @@
-rect {
-  fill: red;
-}
+/* rect {
+  fill: #38454f;
+} */
+
+/* rect {
+  fill: #c5e2e2;
+} */
+
+/* rect {
+  fill: #d6d4ce;
+} */
 rect.selected {
-  fill: steelblue;
+  fill: #38454f;
 }
 
-rect:not(.selected) {
-  fill: yellow;
+rect.pc-frame {
+  fill: #38454f;
+}
+rect.others {
+  fill: #c5e2e2;
+}
+
+rect.others-cross {
+  fill: #eec278;
+}
+
+rect.others-circle1 {
+  fill: #eec278;
+}
+
+rect.others-circle2 {
+  fill: #c77685;
+}
+
+rect.others-circle3 {
+  fill: #ee5f80;
+}
+
+rect.others-circle4 {
+  fill: #ef8770;
+}
+rect.top {
+  fill: #aeb6bb;
+}
+
+rect.bottom {
+  fill: #aeb6bb;
+}
+
+rect.cross {
+  fill: #536a79;
+}
+
+rect.circle1 {
+  fill: #536a79;
+}
+
+rect.circle2 {
+  fill: #536a79;
+}
+
+rect.circle3 {
+  fill: #ebba16;
+}
+
+rect.circle4 {
+  fill: #7383bf;
+}
+
+rect.circle5 {
+  fill: #d75a4a;
+}
+
+rect.circle6 {
+  fill: #61b872;
+}
+
+rect.circle-right {
+  fill: #546a79;
+}
+
+rect.circle-bottom {
+  fill: #283238;
+}
+
+rect.sony-cross {
+  fill: #283238;
+}
+
+rect.sony-circle-blue {
+  fill: #20bee2;
+}
+
+rect.sony-circle-red {
+  fill: #dd352e;
+}
+
+rect.sony-circle-pink {
+  fill: #bf4d90;
+}
+
+rect.sony-circle-purple {
+  fill: #5d7bdb;
 }
 
 div#controllers {

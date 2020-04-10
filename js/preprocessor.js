@@ -29,7 +29,7 @@ export const preprocessor = d3.csv("data/games.csv").then(data => {
 			const game = {};
 			game.name = d.Name;
 			game.platform = d.Platform;
-			game.genre = d.Genre == "Platform" ? "N/A" : d.Genre;
+			game.genre = d.Genre == "Platform" ? "Others" : d.Genre;
 			game.publisher = d.Publisher;
 			game.year = +d.Year_of_Release;
 			game.na_sales = +d.NA_Sales;

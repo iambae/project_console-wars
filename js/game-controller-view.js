@@ -52,7 +52,7 @@ class GameControllerView extends Canvas {
       .data(vis.rectPoints)
       .enter()
       .append("rect")
-      .attr("id", (d) => "game" + d.id)
+      .attr("id", (d) => vis.type + d.id)
       .attr("width", (d) => d.size)
       .attr("height", (d) => d.size)
       .attr("x", (d) => d.x)

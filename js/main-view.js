@@ -67,7 +67,7 @@ class MainView {
 
 		vis.circleRadius = d3.scaleLinear().domain([vis.salesMin, vis.salesMax]).range([10, 150]);
 
-		// Color scale
+		// Color scales
 		vis.critics_colorScaleRange = d3.schemeBlues[9];
 		vis.critics_colorScale = d3
 			.scaleQuantile()
@@ -78,7 +78,7 @@ class MainView {
 		vis.users_colorScale = d3.scaleQuantile().domain([vis.userMin, vis.userMax]).range(vis.users_colorScaleRange);
 		vis.diff_colorScale = d3.scaleSequential(d3.interpolateRdBu).domain([vis.maxScoreDiff, vis.minScoreDiff]);
 
-		vis.initSequentialLegend();
+		vis.initSequentialLegend();		// Create legend for score difference
 		vis.update();
 	}
 
@@ -122,10 +122,10 @@ class MainView {
 		vis.filteredDataArray = _.flatten(_.values(this.filteredData));
 
 		vis.render();
-		vis.initForce();
+		vis.initForce();	// Reapply force simulation
 	}
 
-	initForce() {
+	initForce() {	// Initialize force simulation
 		const allCircles = d3.selectAll("circle");
 		this.force = d3
 			.forceSimulation(this.filteredDataArray)
@@ -141,7 +141,7 @@ class MainView {
 	render() {
 		let vis = this;
 
-		vis.sony_circles = vis.sony_group
+		vis.sony_circles = vis.sony_group 								// Sony Cluster
 			.selectAll(".sony-nodes")
 			.data(vis.filteredData["sony"])
 			.join("circle")
@@ -153,7 +153,7 @@ class MainView {
 			.attr("cy", (d) => +vis.sony_group.attr("y") + Math.random() * vis.padding)
 			.attr("cluster", "Sony");
 
-		vis.microsoft_circles = vis.microsoft_group
+		vis.microsoft_circles = vis.microsoft_group						// Microsoft Cluster
 			.selectAll(".microsoft-nodes")
 			.data(vis.filteredData["microsoft"])
 			.join("circle")
@@ -165,7 +165,7 @@ class MainView {
 			.attr("cy", (d) => +vis.microsoft_group.attr("y") + Math.random() * vis.padding)
 			.attr("cluster", "Microsoft");
 
-		vis.nintendo_circles = vis.nintendo_group
+		vis.nintendo_circles = vis.nintendo_group						// Nintendo Cluster
 			.selectAll(".nintendo-nodes")
 			.data(vis.filteredData["nintendo"])
 			.join("circle")
@@ -177,7 +177,7 @@ class MainView {
 			.attr("cy", (d) => +vis.nintendo_group.attr("y") + Math.random() * vis.padding)
 			.attr("cluster", "nintendo");
 
-		vis.pc_circles = vis.pc_group
+		vis.pc_circles = vis.pc_group									// PC Cluster
 			.selectAll(".pc-nodes")
 			.data(vis.filteredData["pc"])
 			.join("circle")
@@ -201,9 +201,11 @@ class MainView {
 				// if not selected, select it
 				const localSelected = d.console_company + d.id_num;
 
+				// Highlight hover game
 				d3.select("#" + localSelected)
 					.style("stroke", "#FF4F00")
 					.style("stroke-width", "3px");
+				// Highlight same game in other clusters
 				vis.getRelatedIDs(d.name, d.console_company).forEach((d) => {
 					d3.select("#" + d)
 						.style("stroke", "#FF7538")
@@ -231,19 +233,20 @@ class MainView {
 				vis.selectedGame = localSelected;
 			})
 			.on("click", (d) => {
+				// Show Donut Chart and hide tooltips
 				if (d3.select("#pieChart").select("*").empty()) {
 					vis.initDonut(d);
 					d3.select("#pieChart")
 						.style("top", vis.currentHeight / 3 + "px")
 						.style("left", vis.currentWidth + 50 + "px");
-					d3.select(".tooltip").style("opacity", 0); // Hide tooltips
-				} else {
+					d3.select(".tooltip").style("opacity", 0);
+				} else { // Hide Donut Chart and show tooltips
 					d3.select("#pieChart").select("*").remove();
-					d3.select(".tooltip").style("opacity", 1); // Show tooltips
+					d3.select(".tooltip").style("opacity", 1);
 				}
 			})
 			.on("mouseout", (d) => {
-				// if selected, unselect it
+				// Unhighlight the game
 				d3.select("#" + vis.selectedGame)
 					.style("stroke", "black")
 					.style("stroke-width", "1px");
@@ -360,7 +363,7 @@ class MainView {
 			.call(legendaxis);
 	}
 
-	initDonut(d) {
+	initDonut(d) {	// Initialize Donut Chart
 		const na_sales = +d.na_sales == 0 ? 0.0001 : +d.na_sales;
 		const eu_sales = +d.eu_sales == 0 ? 0.0001 : +d.eu_sales;
 		const jp_sales = +d.jp_sales == 0 ? 0.0001 : +d.jp_sales;
@@ -374,7 +377,7 @@ class MainView {
 				location: "pie-center"
 			},
 			size: {
-				canvasWidth: 350,
+				canvasWidth: 380,
 				canvasHeight: 310,
 				pieInnerRadius: "82%",
 				pieOuterRadius: "55%",
@@ -418,11 +421,7 @@ class MainView {
 				percentage: {
 					color: "#999999",
 					fontSize: 13,
-					decimalPlaces: 0,
-				},
-				value: {
-					color: "#cccc43",
-					fontSize: 13,
+					decimalPlaces: 1,
 				},
 				lines: {
 					enabled: true,
@@ -434,7 +433,7 @@ class MainView {
 			},
 			effects: {
 				load: {
-					speed: 50,
+					speed: 100,
 				},
 			},
 			misc: {

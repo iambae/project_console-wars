@@ -213,20 +213,20 @@ class MainView {
 				// Show Game Info in Tooltips
 				// prettier-ignore
 				d3.select(".tooltip")
-				.style("opacity", 1)
-				.style("background", (d) => {
-					return vis.widgetPane.selectedOption == "Critics" ?
-						vis.critics_colorScaleRange[8] :
-						vis.users_colorScaleRange[8]
-				})
-				.html(
-					"<b>" + d.name + "</b> (" + d.year + ")" +
-					"<br/>" + d.platform + "  |  " + d.publisher+
-					"<br/> Global Sales: " +
-					d.global_sales + "M"
-				)
-				.style("top", "430px")
-				.style("left", vis.currentWidth + 30 + d3.select(".tooltip").style("width").replace("px", "") / 2 + "px");
+					.style("opacity", 1)
+					.style("background", (d) => {
+						return vis.widgetPane.selectedOption == "Critics" ?
+							vis.critics_colorScaleRange[8] :
+							vis.users_colorScaleRange[8]
+					})
+					.html(
+						"<b>" + d.name + "</b> (" + d.year + ")" +
+						"<br/>" + d.platform + "  |  " + d.publisher +
+						"<br/> Global Sales: " +
+						d.global_sales + "M"
+					)
+					.style("top", "430px")
+					.style("left", vis.currentWidth + 30 + d3.select(".tooltip").style("width").replace("px", "") / 2 + "px");
 
 				vis.selectedGame = localSelected;
 			})
@@ -290,8 +290,8 @@ class MainView {
 				return selectedOption == "Critics"
 					? vis.critics_colorScale(d.crit_score)
 					: selectedOption == "Users"
-					? vis.users_colorScale(d.user_score)
-					: vis.diff_colorScale(d.score_diff);
+						? vis.users_colorScale(d.user_score)
+						: vis.diff_colorScale(d.score_diff);
 			});
 
 		d3.select(".tooltip").style("background", (d) => {
@@ -343,6 +343,7 @@ class MainView {
 			.tickFormat((d) => (d == 60 ? d + " (User Score - Critics Score)" : d));
 
 		d3.select("#legend")
+			.style("pointer-events", "none")
 			.append("svg")
 			.attr("height", legendheight + 30 + "px")
 			.attr("width", legendwidth + 150 + "px")
@@ -370,13 +371,7 @@ class MainView {
 					text: "Sales By Region",
 					fontSize: 15,
 				},
-				subtitle: {
-					color: "#999999",
-					fontSize: 10,
-					font: "courier",
-				},
-				location: "pie-center",
-				titleSubtitlePadding: 0,
+				location: "pie-center"
 			},
 			size: {
 				canvasWidth: 350,
@@ -390,22 +385,22 @@ class MainView {
 					{
 						label: "North America",
 						value: na_sales,
-						color: "#333333",
+						color: "#C0C0C0",
 					},
 					{
 						label: "Europe",
 						value: eu_sales,
-						color: "#444444",
+						color: "#A9A9A9",
 					},
 					{
 						label: "Japan",
 						value: jp_sales,
-						color: "#555555",
+						color: "#808080",
 					},
 					{
 						label: "Others",
 						value: other_sales,
-						color: "#666666",
+						color: "#696969",
 					},
 				],
 			},

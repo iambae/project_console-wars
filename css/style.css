@@ -1,109 +1,212 @@
-/* rect {
-  fill: #38454f;
-} */
-
-/* rect {
-  fill: #c5e2e2;
-} */
-
-/* rect {
-  fill: #d6d4ce;
-} */
-rect.selected {
-  fill: #38454f;
-}
-
-rect.pc-frame {
-  fill: #38454f;
-}
-rect.others {
-  fill: #c5e2e2;
-}
-
-rect.others-cross {
-  fill: #eec278;
-}
-
-rect.others-circle1 {
-  fill: #eec278;
-}
-
-rect.others-circle2 {
-  fill: #c77685;
-}
-
-rect.others-circle3 {
-  fill: #ee5f80;
-}
-
-rect.others-circle4 {
-  fill: #ef8770;
-}
-rect.top {
-  fill: #aeb6bb;
-}
-
-rect.bottom {
-  fill: #aeb6bb;
-}
-
-rect.cross {
-  fill: #536a79;
-}
-
-rect.circle1 {
-  fill: #536a79;
-}
-
-rect.circle2 {
-  fill: #536a79;
-}
-
-rect.circle3 {
-  fill: #ebba16;
-}
-
-rect.circle4 {
-  fill: #7383bf;
-}
-
-rect.circle5 {
-  fill: #d75a4a;
-}
-
-rect.circle6 {
-  fill: #61b872;
-}
-
-rect.circle-right {
-  fill: #546a79;
-}
-
-rect.circle-bottom {
-  fill: #283238;
-}
-
-rect.sony-cross {
-  fill: #283238;
-}
-
-rect.sony-circle-blue {
-  fill: #20bee2;
-}
-
-rect.sony-circle-red {
-  fill: #dd352e;
-}
-
-rect.sony-circle-pink {
-  fill: #bf4d90;
-}
-
-rect.sony-circle-purple {
-  fill: #5d7bdb;
-}
-
 div#controllers {
   display: flex;
   flex-direction: column;
+}
+
+html,
+body {
+  width: 100%;
+  color: white;
+  background-color: #222831;
+}
+
+.header {
+  padding: 20px;
+  margin-left: 30px;
+}
+
+.header > p {
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.header.genre {
+  position: absolute;
+  top: 5px;
+}
+
+.header.score {
+  position: absolute;
+  top: 95px;
+}
+
+.header.score-option {
+  position: absolute;
+  top: 570px;
+}
+
+.header.year {
+  position: absolute;
+  top: 680px;
+}
+
+div.widget-pane {
+  background-color: #393e46;
+}
+
+div.main-view {
+  background-color: #eeeeee;
+}
+
+div#widgets {
+  display: inline;
+}
+
+div.score-chart {
+  -ms-transform: rotate(90deg);
+  transform: rotate(90deg);
+  width: 400px;
+  height: 300px;
+  position: absolute;
+  top: 180px;
+  left: -90px;
+}
+
+div#user.score-chart {
+  top: 130px;
+  left: 80px;
+}
+
+div.score-chart svg {
+  width: 500px;
+  height: 300px;
+}
+
+div#date-chart {
+  transform: translate(50, 200);
+  position: absolute;
+  top: 730px;
+  left: 40px;
+  width: 700px;
+  height: 150px;
+}
+
+div#date-chart svg {
+  width: 600px;
+  height: 300px;
+}
+
+svg#main {
+  width: 150%;
+}
+
+div.view-col {
+  padding-left: 0px;
+}
+
+div.tooltip {
+  position: absolute;
+  text-align: center;
+  width: auto;
+  height: auto;
+  padding: 5px;
+  font: 12px sans-serif;
+  border: 2px;
+  border-radius: 5px;
+  pointer-events: none;
+}
+
+div.row {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  margin: 0px;
+}
+
+div.container-fluid {
+  padding-top: 20px;
+}
+
+select.dropdown-genre {
+  position: absolute;
+  left: 50px;
+  top: 60px;
+}
+
+select.dropdown-score {
+  position: absolute;
+  left: 50px;
+  top: 630px;
+}
+
+.label {
+  font-family: sans-serif;
+  font-size: 0.5em;
+}
+
+svg {
+  font-family: -apple-system, system-ui, "avenir next", avenir, helvetica,
+    "helvetica neue", ubuntu, roboto, noto, "segoe ui", arial, sans-serif;
+}
+
+rect.overlay {
+  stroke: #888;
+}
+
+rect.selection {
+  stroke: white;
+  fill: white;
+  fill-opacity: 0.4;
+}
+
+.label {
+  font-size: 10px;
+}
+
+.bar text {
+  font-size: 10px;
+}
+
+.ticks text {
+  font-size: 11px;
+}
+
+#labelleft,
+#labelright,
+#label-max,
+#label-min {
+  font-size: 12px;
+}
+
+#label-min,
+#label-max {
+  text-anchor: end;
+}
+
+#labelleft {
+  text-anchor: end;
+}
+
+#labelright {
+  text-anchor: start;
+}
+
+.track,
+.track-inset,
+.track-overlay {
+  stroke-linecap: round;
+}
+
+.track {
+  stroke: #dcdcdc;
+  stroke-width: 10px;
+}
+
+.track-inset {
+  stroke: #dcdcdc;
+  stroke-width: 8px;
+}
+
+.track-overlay {
+  pointer-events: stroke;
+  stroke-width: 50px;
+  stroke: transparent;
+  cursor: crosshair;
+}
+
+.track-handle {
+  fill: #fff;
+  stroke: #000;
+  stroke-opacity: 0.5;
+  stroke-width: 1.25px;
 }

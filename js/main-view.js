@@ -26,23 +26,23 @@ class MainView {
 		vis.sony_group = vis.svg
 			.append("g")
 			.attr("class", "sony")
-			.attr("x", vis.config.containerWidth / 4)
-			.attr("y", vis.config.containerHeight / 4);
+			.attr("x", document.body.offsetWidth / 4)
+			.attr("y", document.body.offsetHeight / 4);
 		vis.microsoft_group = vis.svg
 			.append("g")
 			.attr("class", "microsoft")
-			.attr("x", 3 * vis.config.containerWidth / 4)
-			.attr("y", vis.config.containerHeight / 4);
+			.attr("x", (2 * document.body.offsetWidth) / 4)
+			.attr("y", document.body.offsetHeight / 4);
 		vis.nintendo_group = vis.svg
 			.append("g")
 			.attr("class", "nintendo")
-			.attr("x", vis.config.containerWidth / 4)
-			.attr("y", 3 * vis.config.containerHeight / 4 + 100);
+			.attr("x", document.body.offsetWidth / 4)
+			.attr("y", (2 * document.body.offsetHeight) / 4 + 100);
 		vis.pc_group = vis.svg
 			.append("g")
 			.attr("class", "pc")
-			.attr("x", 3 * vis.config.containerWidth / 4)
-			.attr("y", 3 * vis.config.containerHeight / 4 + 100);
+			.attr("x", (2 * document.body.offsetWidth) / 4)
+			.attr("y", (2 * document.body.offsetHeight) / 4 + 100);
 
 		vis.padding = 1.5; // padding within cluster
 		vis.selectedGame = "";
@@ -54,6 +54,16 @@ class MainView {
 			.attr("class", "tooltip")
 			.attr("style", "position: fixed; opacity: 0;");
 		vis.widthCenterPercent = 35;
+
+		vis.currentWidth = document.getElementById("mainview").offsetWidth;
+		vis.currentHeight = document.getElementById("mainview").offsetHeight;
+
+		// Cetner the clusters on window resize
+		window.visualViewport.addEventListener("resize", () => {
+			vis.currentWidth = document.getElementById("mainview").offsetWidth;
+			vis.currentHeight = document.getElementById("mainview").offsetHeight;
+			vis.initForce();
+		});
 
 		vis.circleRadius = d3.scaleLinear().domain([vis.salesMin, vis.salesMax]).range([10, 150]);
 
@@ -119,16 +129,10 @@ class MainView {
 		const allCircles = d3.selectAll("circle");
 		this.force = d3
 			.forceSimulation(this.filteredDataArray)
-			.force(
-				"center",
-				d3.forceCenter(
-					this.config.containerWidth * (1 - this.widthCenterPercent / 100),
-					this.config.containerHeight / 2 + 30
-				)
-			)
+			.force("center", d3.forceCenter(this.currentWidth / 2 - 10, this.currentHeight / 2 - 60))
 			.force("cluster", this.cluster().strength(0.7))
 			.force("collide", d3.forceCollide((d) => this.circleRadius(d.global_sales) + this.padding).strength(0.7))
-			.force("charge", d3.forceManyBody().strength(0.2))
+			.force("charge", d3.forceManyBody().strength(-3))
 			.on("tick", function () {
 				allCircles.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
 			});
@@ -193,7 +197,7 @@ class MainView {
 		let vis = this;
 		vis.svg
 			.selectAll("circle")
-			.on("mouseover", d => {
+			.on("mouseover", (d) => {
 				// if not selected, select it
 				const localSelected = d.console_company + d.id_num;
 
@@ -217,25 +221,28 @@ class MainView {
 				})
 				.html(
 					"<b>" + d.name + "</b> (" + d.year + ")" +
-					"<br/>" + d.platform + "  |  " + d.genre +
+					"<br/>" + d.platform + "  |  " + d.publisher+
 					"<br/> Global Sales: " +
 					d.global_sales + "M"
 				)
 				.style("top", "430px")
-				.style("left", 1300 - +d3.select(".tooltip").style("width").replace("px", "") / 2 + "px");
+				.style("left", vis.currentWidth + 30 + d3.select(".tooltip").style("width").replace("px", "") / 2 + "px");
 
 				vis.selectedGame = localSelected;
 			})
-			.on("click", d => {
+			.on("click", (d) => {
 				if (d3.select("#pieChart").select("*").empty()) {
 					vis.initDonut(d);
+					d3.select("#pieChart")
+						.style("top", vis.currentHeight / 3 + "px")
+						.style("left", vis.currentWidth + 50 + "px");
 					d3.select(".tooltip").style("opacity", 0); // Hide tooltips
 				} else {
 					d3.select("#pieChart").select("*").remove();
-					d3.select(".tooltip").style("opacity", 1); // Hide tooltips
+					d3.select(".tooltip").style("opacity", 1); // Show tooltips
 				}
 			})
-			.on("mouseout", d => {
+			.on("mouseout", (d) => {
 				// if selected, unselect it
 				d3.select("#" + vis.selectedGame)
 					.style("stroke", "black")
@@ -358,90 +365,92 @@ class MainView {
 		const jp_sales = +d.jp_sales == 0 ? 0.0001 : +d.jp_sales;
 		const other_sales = +d.other_sales == 0 ? 0.0001 : +d.other_sales;
 		const pie = new d3pie("pieChart", {
-			"header": {
-				"title": {
-					"text": "Sales By Region",
-					"fontSize": 15
+			header: {
+				title: {
+					text: "Sales By Region",
+					fontSize: 15,
 				},
-				"subtitle": {
-					"color": "#999999",
-					"fontSize": 10,
-					"font": "courier"
+				subtitle: {
+					color: "#999999",
+					fontSize: 10,
+					font: "courier",
 				},
-				"location": "pie-center",
-				"titleSubtitlePadding": 0
+				location: "pie-center",
+				titleSubtitlePadding: 0,
 			},
-			"size": {
-				"canvasWidth": 320,
-				"pieInnerRadius": "82%",
-				"pieOuterRadius": "55%"
+			size: {
+				canvasWidth: 350,
+				canvasHeight: 310,
+				pieInnerRadius: "82%",
+				pieOuterRadius: "55%",
 			},
-			"data": {
-				"sortOrder": "label-desc",
-				"content": [
+			data: {
+				sortOrder: "label-desc",
+				content: [
 					{
-						"label": "North America",
-						"value": na_sales,
-						"color": "#333333"
+						label: "North America",
+						value: na_sales,
+						color: "#333333",
 					},
 					{
-						"label": "Europe",
-						"value": eu_sales,
-						"color": "#444444"
+						label: "Europe",
+						value: eu_sales,
+						color: "#444444",
 					},
 					{
-						"label": "Japan",
-						"value": jp_sales,
-						"color": "#555555"
+						label: "Japan",
+						value: jp_sales,
+						color: "#555555",
 					},
 					{
-						"label": "Others",
-						"value": other_sales,
-						"color": "#666666"
-					}
-				]
+						label: "Others",
+						value: other_sales,
+						color: "#666666",
+					},
+				],
 			},
-			"labels": {
-				"outer": {
-					"format": "label-percentage1",
-					"pieDistance": 9
+			labels: {
+				outer: {
+					format: "label-percentage1",
+					pieDistance: 15,
 				},
-				"inner": {
-					"format": "none"
+				inner: {
+					format: "none",
 				},
-				"mainLabel": {
-					"fontSize": 11
+				mainLabel: {
+					fontSize: 13,
 				},
-				"percentage": {
-					"color": "#999999",
-					"fontSize": 11,
-					"decimalPlaces": 0
+				percentage: {
+					color: "#999999",
+					fontSize: 13,
+					decimalPlaces: 0,
 				},
-				"value": {
-					"color": "#cccc43",
-					"fontSize": 11
+				value: {
+					color: "#cccc43",
+					fontSize: 13,
 				},
-				"lines": {
-					"enabled": true,
-					"color": "#777777"
+				lines: {
+					enabled: true,
+					color: "#777777",
 				},
-				"truncation": {
-					"enabled": true
-				}
+				truncation: {
+					enabled: true,
+				},
 			},
-			"effects": {
-				"load": {
-					"speed": 50
-				}
+			effects: {
+				load: {
+					speed: 50,
+				},
 			},
-			"misc": {
-				"colors": {
-					"segmentStroke": "#000000"
-				}
-			}
+			misc: {
+				colors: {
+					background: "#ececec",
+					segmentStroke: "#000000",
+				},
+			},
 		});
 	}
-	
+
 	// Move d to be adjacent to the cluster node.
 	// from: https://bl.ocks.org/ericsoco/cd0c38a20141e997e926592264067db3
 	cluster() {

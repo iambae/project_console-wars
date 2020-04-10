@@ -142,7 +142,7 @@ export const sliderScoreWidget = (selection, props) => {
 		.attr("class", "handle--custom")
 		.attr("stroke", "#FFFFFF")
 		.attr("fill", "#EEEEEE")
-		.attr("cursor", "ew-resize")
+		.attr("cursor", "ns-resize")
 		.attr("d", brushResizePath);
 
 	// Override default behaviour (from https://bl.ocks.org/mbostock/6498000)

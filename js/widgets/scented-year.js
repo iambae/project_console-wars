@@ -86,7 +86,7 @@ export const scentedYearView = (selection, props) => {
 
 	const startHandle = slider
 		.insert("ellipse", ".track-overlay")
-		.attr("class", "handle left")
+		.attr("class", "left handle")
 		.attr("rx", 9)
 		.attr("ry", 9)
 		.attr("cx", x(defaultYearRange[0]))
@@ -94,13 +94,14 @@ export const scentedYearView = (selection, props) => {
 
 	const endHandle = slider
 		.insert("ellipse", ".track-overlay")
-		.attr("class", "handle right")
+		.attr("class", "right handle")
 		.attr("rx", 9)
 		.attr("ry", 9)
 		.attr("cx", x(defaultYearRange[1]))
 		.style("fill", "rgb(250, 121, 0)");
 
-	let dx = 0; // change in x position, negative if moved left, init
+	let xloc = 0; // x position in pixels
+	let dx = 0; // change in x
 
 	slider.call(
 		d3
@@ -108,28 +109,32 @@ export const scentedYearView = (selection, props) => {
 			.on("start.interrupt", function () {
 				slider.interrupt();
 			})
-			.on("drag end", function () {
-				const xloc = d3.event.x;
-				if (d3.event.active == 1) dx = d3.event.dx;
-				if (getYear(xloc) < totalRange[0] || getYear(xloc) > totalRange[1]) return;
-
-				// optimized to only pick up on end event
+			.on("start drag end", function () {
+				if (d3.event.dx != 0) dx = d3.event.dx; // last moved distance
 				if (d3.event.type == "end") {
-					const currentLeftX = d3.select(".handle.left").attr("cx"); // x position of left handle
-					const currentRightX = d3.select(".handle.right").attr("cx"); // x position of right handle
-					// x position of end event of drag
+					xloc = d3.event.x;
+					// handle bounds better (min/max)
+					if (xloc < x(totalRange[0])) xloc = x(totalRange[0]);
+					if (xloc > x(totalRange[1])) xloc = x(totalRange[1]);
+
+					const leftX = $(".left.handle").attr("cx");
+					const rightX = $(".right.handle").attr("cx");
 
 					// define conditions of brush movement
-					const rightMovedRight = xloc > currentLeftX + dx && xloc > currentRightX && dx > 0;
-					const leftMovedRight = xloc > currentLeftX + dx && xloc < currentRightX && dx > 0;
-					const leftMovedLeft = xloc < currentLeftX && xloc < currentRightX && dx < 0;
-					const rightMovedLeft = xloc >= currentLeftX && xloc <= currentRightX && dx < 0;
+					const rightMovedRight = xloc > rightX && dx > 0;
+					const leftMovedRight = xloc > leftX && xloc < rightX && dx > 0;
+					const leftMovedLeft = xloc < leftX && dx < 0;
+					const rightMovedLeft = xloc > leftX && xloc < rightX && dx < 0;
 
 					if (rightMovedRight || rightMovedLeft) {
-						updateEndRange(xloc, currentLeftX);
+						if (dx == -1) xloc = x(getYear(xloc) - 1);
+						updateEndRange(xloc, leftX);
 					} else if (leftMovedRight || leftMovedLeft) {
-						updateStartRange(xloc, currentRightX);
+						if (dx == 1) xloc = x(getYear(xloc) + 1);
+						updateStartRange(xloc, rightX);
 					}
+
+					dx = 0;
 				}
 			})
 	);
@@ -137,7 +142,7 @@ export const scentedYearView = (selection, props) => {
 	function updateStartRange(newLeftX, oldRightX) {
 		const updatedStartYear = getYear(newLeftX);
 		// move left handle to new position
-		startHandle.transition().delay(250).attr("cx", x(updatedStartYear));
+		startHandle.attr("cx", x(updatedStartYear));
 		// right handle position stays unchanged
 		const endYear = getYear(oldRightX);
 		const newRange = [updatedStartYear, endYear];
@@ -159,7 +164,7 @@ export const scentedYearView = (selection, props) => {
 	function updateEndRange(newRightX, oldLeftX) {
 		const updatedEndYear = getYear(newRightX);
 		// move right handle to new position
-		endHandle.transition().delay(250).attr("cx", x(updatedEndYear));
+		endHandle.attr("cx", x(updatedEndYear));
 		// left handle position stays unchanged
 		const startYear = getYear(oldLeftX);
 		const newRange = [startYear, updatedEndYear];

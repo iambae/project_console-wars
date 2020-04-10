@@ -1,4 +1,4 @@
-export default class MainView {
+class MainView {
   constructor(_config) {
     this.config = {
       parentElement: _config.parentElement,
@@ -29,23 +29,23 @@ export default class MainView {
     vis.sony_group = vis.svg
       .append("g")
       .attr("class", "sony")
-      .attr("x", vis.config.containerWidth / 4)
-      .attr("y", vis.config.containerHeight / 4)
+      .attr("x", document.body.offsetWidth / 4)
+      .attr("y", document.body.offsetHeight / 4)
     vis.microsoft_group = vis.svg
       .append("g")
       .attr("class", "microsoft")
-      .attr("x", (3 * vis.config.containerWidth) / 4)
-      .attr("y", vis.config.containerHeight / 4)
+      .attr("x", (2 * document.body.offsetWidth) / 4)
+      .attr("y", document.body.offsetHeight / 4)
     vis.nintendo_group = vis.svg
       .append("g")
       .attr("class", "nintendo")
-      .attr("x", vis.config.containerWidth / 4)
-      .attr("y", (3 * vis.config.containerHeight) / 4 + 100)
+      .attr("x", document.body.offsetWidth / 4)
+      .attr("y", (2 * document.body.offsetHeight) / 4 + 100)
     vis.pc_group = vis.svg
       .append("g")
       .attr("class", "pc")
-      .attr("x", (3 * vis.config.containerWidth) / 4)
-      .attr("y", (3 * vis.config.containerHeight) / 4 + 100)
+      .attr("x", (2 * document.body.offsetWidth) / 4)
+      .attr("y", (2 * document.body.offsetHeight) / 4 + 100)
 
     vis.padding = 1.5 // padding within cluster
     vis.selectedGame = ""
@@ -57,6 +57,16 @@ export default class MainView {
       .attr("class", "tooltip")
       .attr("style", "position: fixed; opacity: 0;")
     vis.widthCenterPercent = 35
+
+    vis.currentWidth = document.getElementById("mainview").offsetWidth
+    vis.currentHeight = document.getElementById("mainview").offsetHeight
+
+    // Cetner the clusters on window resize
+    window.visualViewport.addEventListener("resize", () => {
+      vis.currentWidth = document.getElementById("mainview").offsetWidth
+      vis.currentHeight = document.getElementById("mainview").offsetHeight
+      vis.initForce()
+    })
 
     vis.circleRadius = d3
       .scaleLinear()
@@ -135,10 +145,7 @@ export default class MainView {
       .forceSimulation(this.filteredDataArray)
       .force(
         "center",
-        d3.forceCenter(
-          this.config.containerWidth * (1 - this.widthCenterPercent / 100),
-          this.config.containerHeight / 2 + 30
-        )
+        d3.forceCenter(this.currentWidth / 2 - 10, this.currentHeight / 2 - 60)
       )
       .force("cluster", this.cluster().strength(0.7))
       .force(
@@ -147,7 +154,7 @@ export default class MainView {
           .forceCollide((d) => this.circleRadius(d.global_sales) + this.padding)
           .strength(0.7)
       )
-      .force("charge", d3.forceManyBody().strength(0.2))
+      .force("charge", d3.forceManyBody().strength(-3))
       .on("tick", function () {
         allCircles.attr("cx", (d) => d.x).attr("cy", (d) => d.y)
       })
@@ -254,22 +261,25 @@ export default class MainView {
 				})
 				.html(
 					"<b>" + d.name + "</b> (" + d.year + ")" +
-					"<br/>" + d.platform + "  |  " + d.genre +
+					"<br/>" + d.platform + "  |  " + d.publisher+
 					"<br/> Global Sales: " +
 					d.global_sales + "M"
 				)
 				.style("top", "430px")
-				.style("left", 1300 - +d3.select(".tooltip").style("width").replace("px", "") / 2 + "px");
+				.style("left", vis.currentWidth + 30 + d3.select(".tooltip").style("width").replace("px", "") / 2 + "px");
 
         vis.selectedGame = localSelected
       })
       .on("click", (d) => {
         if (d3.select("#pieChart").select("*").empty()) {
           vis.initDonut(d)
+          d3.select("#pieChart")
+            .style("top", vis.currentHeight / 3 + "px")
+            .style("left", vis.currentWidth + 50 + "px")
           d3.select(".tooltip").style("opacity", 0) // Hide tooltips
         } else {
           d3.select("#pieChart").select("*").remove()
-          d3.select(".tooltip").style("opacity", 1) // Hide tooltips
+          d3.select(".tooltip").style("opacity", 1) // Show tooltips
         }
       })
       .on("mouseout", (d) => {
@@ -416,7 +426,8 @@ export default class MainView {
         titleSubtitlePadding: 0,
       },
       size: {
-        canvasWidth: 320,
+        canvasWidth: 350,
+        canvasHeight: 310,
         pieInnerRadius: "82%",
         pieOuterRadius: "55%",
       },
@@ -448,22 +459,22 @@ export default class MainView {
       labels: {
         outer: {
           format: "label-percentage1",
-          pieDistance: 9,
+          pieDistance: 15,
         },
         inner: {
           format: "none",
         },
         mainLabel: {
-          fontSize: 11,
+          fontSize: 13,
         },
         percentage: {
           color: "#999999",
-          fontSize: 11,
+          fontSize: 13,
           decimalPlaces: 0,
         },
         value: {
           color: "#cccc43",
-          fontSize: 11,
+          fontSize: 13,
         },
         lines: {
           enabled: true,
@@ -480,6 +491,7 @@ export default class MainView {
       },
       misc: {
         colors: {
+          background: "#ececec",
           segmentStroke: "#000000",
         },
       },

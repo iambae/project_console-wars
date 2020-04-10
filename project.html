@@ -14,8 +14,16 @@
 
   <body>
     <div class="container-fluid">
+      <button
+        onclick="widgets.style.zoom='80%'"
+        type="button"
+        class="btn btn-light"
+        style="margin-bottom: 10px;"
+      >
+        Reduce left
+      </button>
       <div class="row">
-        <div class="col-md-5 view-col widget-pane">
+        <div class="col-lg-5 view-col widget-pane">
           <div id="widgets">
             <div class="header genre">
               <p>Select games by genre</p>
@@ -36,20 +44,18 @@
             <div id="date-chart"></div>
           </div>
         </div>
-        <div class="col-md-7 view-col main-view">
+        <div class="col-lg-7 view-col main-view" id="mainview">
           <svg id="main"></svg>
           <div id="legend" style="display: inline-block;"></div>
         </div>
       </div>
     </div>
-    <div
-      id="pieChart"
-      style="position: fixed; top: 200px; left: 1135px; pointer-events: none;"
-    ></div>
+    <div id="pieChart" style="pointer-events: none;"></div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.7.2/d3.min.js"></script>
     <script src="d3pie.min.js"></script>
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://getbootstrap.com/docs/4.1/assets/js/vendor/popper.min.js"></script>
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.0/js/bootstrap.min.js"
       type="text/javascript"

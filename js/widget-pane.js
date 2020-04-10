@@ -33,13 +33,17 @@ export default class WidgetPane {
 			.attr("height", vis.config.containerHeight);
 
 		// Add a dropdown to filter by game genre to wiget pane
-		vis.dropdownGenreWidget = vis.div.insert("div", ".header.score").attr("id", "dropdown");
+		vis.dropdownGenreWidget = vis.div
+			.insert("div", ".header.score")
+			.attr("id", "dropdown")
+			.attr("class", "dropdown");
 
 		// Add a dropdown to select game score type to display as circle colors
-		vis.dropdownScoreWidget = vis.div.insert("div", ".header.year");
+		vis.dropdownScoreWidget = vis.div.insert("div", ".header.year").attr("class", "dropdown");
 
 		// Add to wiget pane a scented widget for selecting years of game release
-		vis.scentedYearView = vis.div.select("#date-chart").append("svg");
+		vis.scentedYearView = vis.div.select("#date-chart").append("svg").attr("id", "hist-svg");
+
 		d3.select(".header.year")
 			.append("text")
 			.attr("class", "year-range-text")
@@ -94,5 +98,33 @@ export default class WidgetPane {
 				vis.mainView.update();
 			},
 		});
+	}
+
+	setDefaults(defaults, metadata) {
+		let vis = this;
+
+		vis.selectedGenre = defaults.selectedGenre;
+		vis.selectedYearRange = defaults.selectedYearRange;
+		vis.selectedOption = defaults.selectedOption;
+		vis.scoreData = {
+			critics: {
+				name: "Critics", // for dropdown
+				default: defaults.selectedCriticScoreRange,
+				all: [metadata[0], metadata[1]],
+				color: d3.interpolateBlues,
+			},
+			users: {
+				name: "Users", // for dropdown
+				default: defaults.selectedUserScoreRange,
+				all: [metadata[2], metadata[3]],
+				color: d3.interpolateReds,
+			},
+			diff: {
+				name: "Differences", // for dropdown
+				default: defaults.selectedDiffScoreRange,
+				all: [metadata[4], metadata[5]],
+				color: d3.interpolateRdBu,
+			},
+		};
 	}
 }

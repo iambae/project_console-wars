@@ -1,4 +1,4 @@
-export const preprocessor = d3.csv("data/games.csv").then(data => {
+export const preprocessor = d3.csv("data/games.csv").then((data) => {
 	let salesMax = 0,
 		criticMax = 0,
 		userMax = 0,
@@ -21,7 +21,7 @@ export const preprocessor = d3.csv("data/games.csv").then(data => {
 			],
 			[
 				/*PC*/
-			]
+			],
 		];
 		for (const [i, d] of data.entries()) {
 			if (d.Critic_Score === "" || d.User_Score === "") continue;
@@ -71,6 +71,7 @@ export const preprocessor = d3.csv("data/games.csv").then(data => {
 	}
 
 	const mainViewData = formatDataForMain();
+	const metadata = [criticMax, criticMin, userMax, userMin, maxScoreDiff, minScoreDiff];
 
-	return { mainViewData, salesMax, salesMin, criticMax, criticMin, userMax, userMin, maxScoreDiff, minScoreDiff };
+	return { mainViewData, salesMax, salesMin, metadata };
 });

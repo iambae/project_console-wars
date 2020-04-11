@@ -1,4 +1,4 @@
-class MainView {
+export default class MainView {
 	constructor(_config) {
 		this.config = {
 			parentElement: _config.parentElement,
@@ -44,6 +44,7 @@ class MainView {
 			.attr("x", (2 * document.body.offsetWidth) / 4)
 			.attr("y", (2 * document.body.offsetHeight) / 4 + 100);
 
+		vis.labelCluster(); // add label text for clusters
 		vis.padding = 1.5; // padding within cluster
 		vis.selectedGame = "";
 
@@ -80,6 +81,32 @@ class MainView {
 
 		vis.initSequentialLegend();		// Create legend for score difference
 		vis.update();
+	}
+
+	labelCluster() {
+		this.sony_group.append("text")
+			.attr("x", this.sony_group.attr("x") - 200)
+			.attr("y", 30)
+			.attr("font-size", "30px")
+			.text("Sony");
+
+		this.microsoft_group.append("text")
+			.attr("x", this.microsoft_group.attr("x") - 200)
+			.attr("y", 30)
+			.attr("font-size", "30px")
+			.text("Microsoft");
+
+		this.nintendo_group.append("text")
+			.attr("x", this.nintendo_group.attr("x") - 200)
+			.attr("y", document.body.offsetHeight - 200)
+			.attr("font-size", "30px")
+			.text("Nintendo");
+
+		this.pc_group.append("text")
+			.attr("x", this.pc_group.attr("x") - 150)
+			.attr("y", document.body.offsetHeight - 200)
+			.attr("font-size", "30px")
+			.text("PC");
 	}
 
 	filterGame(gameArr) {
@@ -122,14 +149,14 @@ class MainView {
 		vis.filteredDataArray = _.flatten(_.values(this.filteredData));
 
 		vis.render();
-		vis.initForce();	// Reapply force simulation
+		vis.initForce();	// recalculate force simulation
 	}
 
-	initForce() {	// Initialize force simulation
+	initForce() {
 		const allCircles = d3.selectAll("circle");
 		this.force = d3
 			.forceSimulation(this.filteredDataArray)
-			.force("center", d3.forceCenter(this.currentWidth / 2 - 10, this.currentHeight / 2 - 60))
+			.force("center", d3.forceCenter(this.currentWidth / 2 - 10, this.currentHeight / 2 - 100))
 			.force("cluster", this.cluster().strength(0.7))
 			.force("collide", d3.forceCollide((d) => this.circleRadius(d.global_sales) + this.padding).strength(0.7))
 			.force("charge", d3.forceManyBody().strength(-3))
@@ -141,7 +168,7 @@ class MainView {
 	render() {
 		let vis = this;
 
-		vis.sony_circles = vis.sony_group 								// Sony Cluster
+		vis.sony_circles = vis.sony_group	// Sony Cluster
 			.selectAll(".sony-nodes")
 			.data(vis.filteredData["sony"])
 			.join("circle")
@@ -153,7 +180,7 @@ class MainView {
 			.attr("cy", (d) => +vis.sony_group.attr("y") + Math.random() * vis.padding)
 			.attr("cluster", "Sony");
 
-		vis.microsoft_circles = vis.microsoft_group						// Microsoft Cluster
+		vis.microsoft_circles = vis.microsoft_group		// Microsoft Cluster
 			.selectAll(".microsoft-nodes")
 			.data(vis.filteredData["microsoft"])
 			.join("circle")
@@ -165,7 +192,7 @@ class MainView {
 			.attr("cy", (d) => +vis.microsoft_group.attr("y") + Math.random() * vis.padding)
 			.attr("cluster", "Microsoft");
 
-		vis.nintendo_circles = vis.nintendo_group						// Nintendo Cluster
+		vis.nintendo_circles = vis.nintendo_group		// Nintendo Cluster
 			.selectAll(".nintendo-nodes")
 			.data(vis.filteredData["nintendo"])
 			.join("circle")
@@ -177,7 +204,7 @@ class MainView {
 			.attr("cy", (d) => +vis.nintendo_group.attr("y") + Math.random() * vis.padding)
 			.attr("cluster", "nintendo");
 
-		vis.pc_circles = vis.pc_group									// PC Cluster
+		vis.pc_circles = vis.pc_group					// PC Cluster
 			.selectAll(".pc-nodes")
 			.data(vis.filteredData["pc"])
 			.join("circle")
@@ -201,11 +228,9 @@ class MainView {
 				// if not selected, select it
 				const localSelected = d.console_company + d.id_num;
 
-				// Highlight hover game
 				d3.select("#" + localSelected)
 					.style("stroke", "#FF4F00")
 					.style("stroke-width", "3px");
-				// Highlight same game in other clusters
 				vis.getRelatedIDs(d.name, d.console_company).forEach((d) => {
 					d3.select("#" + d)
 						.style("stroke", "#FF7538")
@@ -227,7 +252,7 @@ class MainView {
 						"<br/> Global Sales: " +
 						d.global_sales + "M"
 					)
-					.style("top", "430px")
+					.style("top", vis.currentHeight / 2 + "px")
 					.style("left", vis.currentWidth + 30 + d3.select(".tooltip").style("width").replace("px", "") / 2 + "px");
 
 				vis.selectedGame = localSelected;
@@ -241,7 +266,7 @@ class MainView {
 						.style("left", vis.currentWidth + 50 + "px");
 					d3.select(".tooltip").style("opacity", 0);
 				} else { // Hide Donut Chart and show tooltips
-					d3.select("#pieChart").select("*").remove();
+					d3.select("#pieChart").selectAll("*").remove();
 					d3.select(".tooltip").style("opacity", 1);
 				}
 			})
@@ -258,7 +283,7 @@ class MainView {
 
 				d3.select(".tooltip").style("opacity", 0); // Hide tooltips
 
-				d3.select("#pieChart").select("*").remove();
+				d3.select("#pieChart").selectAll("*").remove();
 
 				vis.selectedGame = "";
 			});
@@ -443,6 +468,12 @@ class MainView {
 				},
 			},
 		});
+
+		d3.select("#pieChart").select("svg").append("text")
+			.attr("x", 15)
+			.attr("y", 30)
+			.style("color", "black")
+			.text(d.name);
 	}
 
 	// Move d to be adjacent to the cluster node.

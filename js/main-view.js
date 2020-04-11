@@ -44,6 +44,7 @@ export default class MainView {
 			.attr("x", (2 * document.body.offsetWidth) / 4)
 			.attr("y", (2 * document.body.offsetHeight) / 4 + 100);
 
+		vis.labelCluster(); // add label text for clusters
 		vis.padding = 1.5; // padding within cluster
 		vis.selectedGame = "";
 
@@ -67,7 +68,7 @@ export default class MainView {
 
 		vis.circleRadius = d3.scaleLinear().domain([vis.salesMin, vis.salesMax]).range([10, 150]);
 
-		// Color scale
+		// Color scales
 		vis.critics_colorScaleRange = d3.schemeBlues[9];
 		vis.critics_colorScale = d3
 			.scaleQuantile()
@@ -78,8 +79,34 @@ export default class MainView {
 		vis.users_colorScale = d3.scaleQuantile().domain([vis.userMin, vis.userMax]).range(vis.users_colorScaleRange);
 		vis.diff_colorScale = d3.scaleSequential(d3.interpolateRdBu).domain([vis.maxScoreDiff, vis.minScoreDiff]);
 
-		vis.initSequentialLegend();
+		vis.initSequentialLegend();		// Create legend for score difference
 		vis.update();
+	}
+
+	labelCluster() {
+		this.sony_group.append("text")
+			.attr("x", this.sony_group.attr("x") - 200)
+			.attr("y", 30)
+			.attr("font-size", "30px")
+			.text("Sony");
+
+		this.microsoft_group.append("text")
+			.attr("x", this.microsoft_group.attr("x") - 200)
+			.attr("y", 30)
+			.attr("font-size", "30px")
+			.text("Microsoft");
+
+		this.nintendo_group.append("text")
+			.attr("x", this.nintendo_group.attr("x") - 200)
+			.attr("y", document.body.offsetHeight - 200)
+			.attr("font-size", "30px")
+			.text("Nintendo");
+
+		this.pc_group.append("text")
+			.attr("x", this.pc_group.attr("x") - 150)
+			.attr("y", document.body.offsetHeight - 200)
+			.attr("font-size", "30px")
+			.text("PC");
 	}
 
 	filterGame(gameArr) {
@@ -122,7 +149,7 @@ export default class MainView {
 		vis.filteredDataArray = _.flatten(_.values(this.filteredData));
 
 		vis.render();
-		vis.initForce();
+		vis.initForce();	// recalculate force simulation
 	}
 
 	initForce() {
@@ -141,7 +168,7 @@ export default class MainView {
 	render() {
 		let vis = this;
 
-		vis.sony_circles = vis.sony_group
+		vis.sony_circles = vis.sony_group	// Sony Cluster
 			.selectAll(".sony-nodes")
 			.data(vis.filteredData["sony"])
 			.join("circle")
@@ -153,7 +180,7 @@ export default class MainView {
 			.attr("cy", (d) => +vis.sony_group.attr("y") + Math.random() * vis.padding)
 			.attr("cluster", "Sony");
 
-		vis.microsoft_circles = vis.microsoft_group
+		vis.microsoft_circles = vis.microsoft_group		// Microsoft Cluster
 			.selectAll(".microsoft-nodes")
 			.data(vis.filteredData["microsoft"])
 			.join("circle")
@@ -165,7 +192,7 @@ export default class MainView {
 			.attr("cy", (d) => +vis.microsoft_group.attr("y") + Math.random() * vis.padding)
 			.attr("cluster", "Microsoft");
 
-		vis.nintendo_circles = vis.nintendo_group
+		vis.nintendo_circles = vis.nintendo_group		// Nintendo Cluster
 			.selectAll(".nintendo-nodes")
 			.data(vis.filteredData["nintendo"])
 			.join("circle")
@@ -177,7 +204,7 @@ export default class MainView {
 			.attr("cy", (d) => +vis.nintendo_group.attr("y") + Math.random() * vis.padding)
 			.attr("cluster", "nintendo");
 
-		vis.pc_circles = vis.pc_group
+		vis.pc_circles = vis.pc_group					// PC Cluster
 			.selectAll(".pc-nodes")
 			.data(vis.filteredData["pc"])
 			.join("circle")
@@ -195,15 +222,15 @@ export default class MainView {
 
 	handleSelection() {
 		let vis = this;
-		vis.svg
-			.selectAll("circle")
+		vis.svg.selectAll("circle")
 			.on("mouseover", (d) => {
-				// if not selected, select it
 				const localSelected = d.console_company + d.id_num;
 
+				// highlight selected games
 				d3.select("#" + localSelected)
 					.style("stroke", "#FF4F00")
 					.style("stroke-width", "3px");
+				// highlight same game in other clusters
 				vis.getRelatedIDs(d.name, d.console_company).forEach((d) => {
 					d3.select("#" + d)
 						.style("stroke", "#FF7538")
@@ -213,37 +240,38 @@ export default class MainView {
 				// Show Game Info in Tooltips
 				// prettier-ignore
 				d3.select(".tooltip")
-				.style("opacity", 1)
-				.style("background", (d) => {
-					return vis.widgetPane.selectedOption == "Critics" ?
-						vis.critics_colorScaleRange[8] :
-						vis.users_colorScaleRange[8]
-				})
-				.html(
-					"<b>" + d.name + "</b> (" + d.year + ")" +
-					"<br/>" + d.platform + "  |  " + d.publisher+
-					"<br/> Global Sales: " +
-					d.global_sales + "M"
-				)
-				.style("top", vis.currentHeight / 2 + "px")
-				.style("left", vis.currentWidth + 30 + d3.select(".tooltip").style("width").replace("px", "") / 2 + "px");
+					.style("opacity", 1)
+					.style("background", (d) => {
+						return vis.widgetPane.selectedOption == "Critics" ?
+							vis.critics_colorScaleRange[8] :
+							vis.users_colorScaleRange[8]
+					})
+					.html(
+						"<b>" + d.name + "</b> (" + d.year + ")" +
+						"<br/>" + d.platform + "  |  " + d.publisher +
+						"<br/> Global Sales: " +
+						d.global_sales + "M"
+					)
+					.style("top", vis.currentHeight / 2 + "px")
+					.style("left", vis.currentWidth + 30 + d3.select(".tooltip").style("width").replace("px", "") / 2 + "px");
 
 				vis.selectedGame = localSelected;
 			})
 			.on("click", (d) => {
+				// Show Donut Chart and hide tooltips
 				if (d3.select("#pieChart").select("*").empty()) {
 					vis.initDonut(d);
 					d3.select("#pieChart")
-						.style("top", vis.currentHeight / 2 + "px")
+						.style("top", vis.currentHeight / 3 + "px")
 						.style("left", vis.currentWidth + 50 + "px");
-					d3.select(".tooltip").style("opacity", 0); // Hide tooltips
-				} else {
-					d3.select("#pieChart").select("*").remove();
-					d3.select(".tooltip").style("opacity", 1); // Show tooltips
+					d3.select(".tooltip").style("opacity", 0);
+				} else { // Hide Donut Chart and show tooltips
+					d3.select("#pieChart").selectAll("*").remove();
+					d3.select(".tooltip").style("opacity", 1);
 				}
 			})
 			.on("mouseout", (d) => {
-				// if selected, unselect it
+				// Unhighlight the game
 				d3.select("#" + vis.selectedGame)
 					.style("stroke", "black")
 					.style("stroke-width", "1px");
@@ -255,7 +283,7 @@ export default class MainView {
 
 				d3.select(".tooltip").style("opacity", 0); // Hide tooltips
 
-				d3.select("#pieChart").select("*").remove();
+				d3.select("#pieChart").selectAll("*").remove();
 
 				vis.selectedGame = "";
 			});
@@ -290,8 +318,8 @@ export default class MainView {
 				return selectedOption == "Critics"
 					? vis.critics_colorScale(d.crit_score)
 					: selectedOption == "Users"
-					? vis.users_colorScale(d.user_score)
-					: vis.diff_colorScale(d.score_diff);
+						? vis.users_colorScale(d.user_score)
+						: vis.diff_colorScale(d.score_diff);
 			});
 
 		d3.select(".tooltip").style("background", (d) => {
@@ -302,6 +330,9 @@ export default class MainView {
 		else d3.select("#legend").style("opacity", 0);
 	}
 
+	/*
+	Below are borrowed functions
+	*/
 	// from http://bl.ocks.org/syntagmatic/e8ccca52559796be775553b467593a9f
 	initSequentialLegend() {
 		const vis = this,
@@ -343,6 +374,7 @@ export default class MainView {
 			.tickFormat((d) => (d == 60 ? d + " (User Score - Critics Score)" : d));
 
 		d3.select("#legend")
+			.style("pointer-events", "none")
 			.append("svg")
 			.attr("height", legendheight + 30 + "px")
 			.attr("width", legendwidth + 150 + "px")
@@ -359,7 +391,8 @@ export default class MainView {
 			.call(legendaxis);
 	}
 
-	initDonut(d) {
+	// function generated by http://d3pie.org/ and modified
+	initDonut(d) {	// Initialize Donut Chart
 		const na_sales = +d.na_sales == 0 ? 0.0001 : +d.na_sales;
 		const eu_sales = +d.eu_sales == 0 ? 0.0001 : +d.eu_sales;
 		const jp_sales = +d.jp_sales == 0 ? 0.0001 : +d.jp_sales;
@@ -370,16 +403,10 @@ export default class MainView {
 					text: "Sales By Region",
 					fontSize: 15,
 				},
-				subtitle: {
-					color: "#999999",
-					fontSize: 10,
-					font: "courier",
-				},
-				location: "pie-center",
-				titleSubtitlePadding: 0,
+				location: "pie-center"
 			},
 			size: {
-				canvasWidth: 350,
+				canvasWidth: 380,
 				canvasHeight: 310,
 				pieInnerRadius: "82%",
 				pieOuterRadius: "55%",
@@ -390,22 +417,22 @@ export default class MainView {
 					{
 						label: "North America",
 						value: na_sales,
-						color: "#333333",
+						color: "#C0C0C0",
 					},
 					{
 						label: "Europe",
 						value: eu_sales,
-						color: "#444444",
+						color: "#A9A9A9",
 					},
 					{
 						label: "Japan",
 						value: jp_sales,
-						color: "#555555",
+						color: "#808080",
 					},
 					{
 						label: "Others",
 						value: other_sales,
-						color: "#666666",
+						color: "#696969",
 					},
 				],
 			},
@@ -423,11 +450,7 @@ export default class MainView {
 				percentage: {
 					color: "#999999",
 					fontSize: 13,
-					decimalPlaces: 0,
-				},
-				value: {
-					color: "#cccc43",
-					fontSize: 13,
+					decimalPlaces: 1,
 				},
 				lines: {
 					enabled: true,
@@ -439,7 +462,7 @@ export default class MainView {
 			},
 			effects: {
 				load: {
-					speed: 50,
+					speed: 100,
 				},
 			},
 			misc: {
@@ -449,6 +472,12 @@ export default class MainView {
 				},
 			},
 		});
+
+		d3.select("#pieChart").select("svg").append("text")
+			.attr("x", 15)
+			.attr("y", 30)
+			.style("color", "black")
+			.text(d.name);
 	}
 
 	// Move d to be adjacent to the cluster node.

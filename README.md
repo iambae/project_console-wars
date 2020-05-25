@@ -54,7 +54,7 @@ http://localhost:8000/index.html
 
 ### Student contributors
 
--   [Nicole](https://github.com/njbdev)
+-   [Nicole](https://github.com/iamnjb)
 -   [Megha](https://github.students.cs.ubc.ca/meghas22)
 -   [Wesley](https://github.students.cs.ubc.ca/wesleywh)
 
